@@ -1,0 +1,66 @@
+[user]
+	name = Parker Coates
+	email = coates@qps.nl
+
+[advice]
+	statusHints = false
+	detachedHead = false
+
+[branch]
+	autosetuprebase = always
+
+[cola]
+	tabwidth = 4
+	textwidth = 70
+
+[color]
+	ui = true
+
+[core]
+	excludesfile = ~/.gitignore-global
+#	pager = less $LESS -FRXS
+	whitespace = blank-at-eol,space-before-tab,tab-in-indent,blank-at-eof
+	autocrlf = input
+
+
+[diff]
+	tool = kompare
+	mnemonicprefix = true
+	renames = copies
+
+[gui]
+	editor = kate
+	historybrowser = gitk
+	diffcontext = 6
+
+[log]
+	date = iso
+	decorate = short
+
+[merge]
+	tool = kdiff3
+
+[push]
+	default = simple
+
+[rebase]
+	autosquash = true
+
+[url "git://anongit.kde.org/"]
+	insteadOf = kde:
+
+[url "git@git.kde.org:"]
+	pushInsteadOf = kde:
+
+[alias]
+	plog = log --graph --format=format:'%C(bold blue)%h%Creset%C(bold magenta)%d%Creset %C(green)%an%Creset %s %C(yellow)(%cr)'
+	ls-ignored = ls-files -o -i --exclude-standard
+	st = status --short
+	unadd = reset HEAD
+	unstage = reset HEAD
+	quick-rebase = !git rebase -i $(git-rebase-i-base)
+
+
+
+[merge "ours"]
+	driver = true
