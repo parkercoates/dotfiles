@@ -1,0 +1,7 @@
+--smart-case
+--ignore-dir=.ui
+--ignore-dir=.moc
+--ignore-dir=.obj
+--type-set=qmake=.pro
+--type-set=qtui=.ui
+
