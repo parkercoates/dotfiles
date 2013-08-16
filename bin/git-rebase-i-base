@@ -1,0 +1,11 @@
+#! /bin/sh
+
+commit=$(git rev-parse HEAD)
+
+while [ "$(git log --format="%p" -1 $commit | wc -w)" -eq 1 ] \
+      && [ "$(git branch --all --contains $commit | wc -l)" -eq 1 ]
+do
+    commit=$(git rev-parse "$commit^")
+done
+
+echo $commit
