@@ -4,4 +4,5 @@
 --ignore-dir=.obj
 --type-set=qmake=.pro
 --type-set=qtui=.ui
+--type-set=qt=.cpp,.h,.hpp,.ui,.qrc,.pro
 
