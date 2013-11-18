@@ -45,6 +45,7 @@
 
 [rebase]
 	autosquash = true
+	autostash = true
 
 [url "git://anongit.kde.org/"]
 	insteadOf = kde:
