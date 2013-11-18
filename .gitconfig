@@ -59,8 +59,7 @@
 	unadd = reset HEAD
 	unstage = reset HEAD
 	quick-rebase = !git rebase -i $(git-rebase-i-base)
-
-
+	qr = !git quick-rebase
 
 [merge "ours"]
 	driver = true
