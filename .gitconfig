@@ -64,3 +64,6 @@
 
 [merge "ours"]
 	driver = true
+
+[rerere]
+	enabled = true
