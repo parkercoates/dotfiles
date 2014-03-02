@@ -17,6 +17,9 @@ set incsearch
 
 set novisualbell
 
+"Make Y behave like C and D
+nnoremap Y y$
+
 "Whitespace stuff
 
 nnoremap <Space> i<Space><Esc>l
