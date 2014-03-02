@@ -61,6 +61,8 @@
 	unstage = reset HEAD
 	quick-rebase = !git rebase -i $(git-rebase-i-base)
 	qr = !git quick-rebase
+	bpull = !git-branch-pull
+	bpush = !git-branch-push
 
 [merge "ours"]
 	driver = true

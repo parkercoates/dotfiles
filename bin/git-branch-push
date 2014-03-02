@@ -1,0 +1,16 @@
+#! /bin/sh
+
+if [ x$1 = x ]; then
+    remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+else
+    remoteBranch=$1
+fi
+
+remote=$(echo $remoteBranch | cut -d'/' -f1)
+branch=$(echo $remoteBranch | cut -d'/' -f2)
+
+if [ "$remote/$branch" = "$remoteBranch" ] && git show-branch $remoteBranch >/dev/null; then
+    git push $remote HEAD:$branch
+else
+    echo Problem with $remoteBranch.
+fi

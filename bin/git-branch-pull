@@ -1,0 +1,19 @@
+#! /bin/sh
+
+if [ x$1 = x ]; then
+    destBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+else
+    destBranch=$1
+fi
+
+case "$destBranch" in
+*/*)
+    remote=$(echo $destBranch | cut -d'/' -f1)
+    branch=$(echo $destBranch | cut -d'/' -f2)
+    git fetch $remote $branch && git rebase --autostash $destBranch
+    ;;
+*)
+    git rebase --autostash $destBranch
+    ;;
+esac
+
