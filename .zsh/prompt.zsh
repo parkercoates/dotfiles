@@ -188,7 +188,7 @@ function setprompt()
     done
     pr[lineColor]=$pr[blue]
 
-    # Assume that xterms and 256 color terminals support unicode.
+    # Assume that xterms and 256 color terminals support Unicode.
     # Not realistic, but good enough for the machines I use.
     if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
         pr[leftCorner]='╭'
@@ -210,9 +210,9 @@ function setprompt()
         pr[stagedSymbol]='±'
         pr[timeSymbol]='Runtime:'
         pr[returnSymbol]='Returned:'
-        pr[aheadSymbol]='+'
-        pr[behindSymbol]='-'
-        pr[stashSymbol]='#'
+        pr[aheadSymbol]='>'
+        pr[behindSymbol]='<'
+        pr[stashSymbol]='$'
         pr[conflictSymbol]='!'
     fi
 
