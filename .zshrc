@@ -44,13 +44,15 @@ source $ZSH/fasd.zsh
 
 source $ZSH/history.zsh
 
-source $ZSH/history-substring-search/zsh-history-substring-search.zsh
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
 source $ZSH/keys.zsh
 
 source $ZSH/prompt.zsh
 PR_DEFAULT_USER=coates@halfpounddonair
 
 source $ZSH/tmux.zsh
+
+source $ZSH/history-substring-search/zsh-history-substring-search.zsh
+bindkey '^[[A' history-substring-search-up
+bindkey '^h' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
