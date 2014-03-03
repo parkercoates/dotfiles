@@ -82,17 +82,13 @@ function compressPath()
 
 function elapsedTimeFormat()
 {
-    integer seconds=$1
+    integer -Z2 seconds=$1
     if (( $seconds >= 60 )); then
-        local minutes
+        integer minutes
         (( minutes = $seconds / 60 ))
         (( seconds = $seconds % 60 ))
-        minutes="${minutes}m"
-        if (( $seconds < 10 )); then
-            minutes="${minutes}0"
-        fi
     fi
-    echo "$minutes${seconds}s"
+    echo "${minutes}m${seconds}s"
 }
 
 function +vi-git-stash()
