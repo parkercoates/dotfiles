@@ -63,6 +63,7 @@
 	qr = !git quick-rebase
 	bpull = !git-branch-pull
 	bpush = !git-branch-push
+	wipi = wip --index-only
 
 [merge "ours"]
 	driver = true

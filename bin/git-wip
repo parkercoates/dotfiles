@@ -1,0 +1,15 @@
+#! /bin/sh
+
+case $(git show -s --format=%s HEAD) in
+wip!*)
+    git reset --soft HEAD~
+    ;;
+*)
+    if [ "$1" != "-i" -a "$1" != "--index-only" ]; then
+        git add -A
+        git ls-files --deleted -z | xargs -0r git rm
+    fi
+    git commit -m "wip!"
+    ;;
+esac
+
