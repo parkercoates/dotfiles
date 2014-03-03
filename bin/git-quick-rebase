@@ -8,4 +8,4 @@ do
     commit=$(git rev-parse "$commit^")
 done
 
-echo $commit
+git rebase -i $commit

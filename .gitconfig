@@ -59,10 +59,9 @@
 	st = status --short
 	unadd = reset HEAD
 	unstage = reset HEAD
-	quick-rebase = !git rebase -i $(git-rebase-i-base)
-	qr = !git quick-rebase
-	bpull = !git-branch-pull
-	bpush = !git-branch-push
+	qr = quick-rebase
+	bpull = branch-pull
+	bpush = branch-push
 	wipi = wip --index-only
 
 [merge "ours"]
