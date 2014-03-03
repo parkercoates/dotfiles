@@ -106,6 +106,14 @@ function +vi-git-stash()
     fi
 }
 
+function +vi-git-conflicts()
+{
+    local conflictCount=$(git ls-files --unmerged 2>/dev/null | cut -f2 | uniq | wc -l)
+    if (( $conflictCount > 0 )); then
+        hook_com[misc]+="$pr[lineColor]│$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
+    fi
+}
+
 function +vi-git-ahead-behind()
 {
     git-ahead-behind "$hook_com[branch]@{upstream}"
@@ -193,6 +201,7 @@ function setprompt()
         pr[aheadSymbol]='↥'
         pr[behindSymbol]='↧'
         pr[stashSymbol]='↶'
+        pr[conflictSymbol]='✖'
     else
         pr[leftCorner]='┌'
         pr[rightCorner]='┐'
@@ -204,6 +213,7 @@ function setprompt()
         pr[aheadSymbol]='+'
         pr[behindSymbol]='-'
         pr[stashSymbol]='#'
+        pr[conflictSymbol]='!'
     fi
 
     autoload -Uz vcs_info
@@ -212,7 +222,7 @@ function setprompt()
 
     zstyle ':vcs_info:*' enable git svn
     zstyle ':vcs_info:*' check-for-changes true
-    zstyle ':vcs_info:git+set-message:*' hooks git-ahead-behind git-stash
+    zstyle ':vcs_info:git+set-message:*' hooks git-conflicts git-ahead-behind git-stash
     zstyle ':vcs_info:git-svn+set-message:*' hooks git-svn-ahead-behind git-stash
     zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B$pr[modifiedSymbol]%b"
     zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B$pr[stagedSymbol]%b"
