@@ -181,8 +181,8 @@ function setprompt()
         local PR_RIGHTCORNER='╮'
         local PR_PROMPTCHAR='❱'
         local PR_MINUSPLUS='∓'
-        local PR_TIMEINDICATOR='⌛'
-        local PR_RETURNINDICATOR='↳'
+        PR_TIMEINDICATOR='⌛'
+        PR_RETURNINDICATOR='↳'
         PR_BRANCHAHEAD='↥'
         PR_BRANCHBEHIND='↧'
         PR_STASH='↶'
@@ -191,8 +191,8 @@ function setprompt()
         local PR_RIGHTCORNER='┐'
         local PR_PROMPTCHAR='>'
         local PR_MINUSPLUS='±'
-        local PR_TIMEINDICATOR='Runtime:'
-        local PR_RETURNINDICATOR='Returned:'
+        PR_TIMEINDICATOR='Runtime:'
+        PR_RETURNINDICATOR='Returned:'
         PR_BRANCHAHEAD='+'
         PR_BRANCHBEHIND='-'
         PR_STASH='#'
@@ -213,7 +213,7 @@ function setprompt()
     zstyle ':vcs_info:*' formats       "┤$PR_BRANCHFORMAT$PR_BLUE├" "$PR_PATHFORMAT"
     zstyle ':vcs_info:*' nvcsformats   "" "%d"
 
-    PROMPT="       %(?..$PR_RED%B\$PR_RETURNINDICATOR $? %b)$PR_YELLOW\${PR_CMDRUNTIME:-%(?..
+    PROMPT="       %(?..$PR_RED%B\$PR_RETURNINDICATOR \$? %b)$PR_YELLOW\${PR_CMDRUNTIME:-%(?..
 )}
 $PR_BLUE$PR_LEFTCORNER──$PR_USER┤$PR_WHITE%B\$PR_PWD%b$PR_BLUE├─\
 \${(e)PR_FILLER}\$vcs_info_msg_0_$PR_BLUE──$PR_RIGHTCORNER
