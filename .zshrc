@@ -23,10 +23,10 @@ eval `dircolors -b`
 
 WORDCHARS='_-'
 
-export PATH=/home/coates/bin:$PATH
+export PATH=~/bin:$PATH
 
-if [[ -f /home/coates/qps-devel/qps-dev-env.sh ]]; then
-    source /home/coates/qps-devel/qps-dev-env.sh
+if [[ -f ~/qps-devel/qps-dev-env.sh ]]; then
+    source ~/qps-devel/qps-dev-env.sh
 fi
 #source ~/kde-devel/setup/kde-devel-env.sh
 
@@ -53,7 +53,6 @@ source $ZSH/tmux.zsh
 
 source $ZSH/history-substring-search/zsh-history-substring-search.zsh
 bindkey '^[[A' history-substring-search-up
-bindkey '^h' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 
