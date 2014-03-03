@@ -176,8 +176,9 @@ function setprompt()
     done
     pr[lineColor]=$pr[blue]
 
-    # Virtual consoles don't support Unicode fanciness.
-    if [[ "$TERM" == xterm* || ("$TERM" = "screen" && (-n "$DISPLAY" || -n "$SSH_TTY")) ]]; then
+    # Assume that xterms and 256 color terminals support unicode.
+    # Not realistic, but good enough for the machines I use.
+    if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
         pr[leftCorner]='╭'
         pr[rightCorner]='╮'
         pr[promptSymbol]='❱'
