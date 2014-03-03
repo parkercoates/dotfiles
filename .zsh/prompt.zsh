@@ -1,6 +1,6 @@
 function preexec()
 {
-    PR_LASTCMDSTART=$SECONDS
+    pr[lastCmdStart]=$SECONDS
 }
 
 function expandStrip()
@@ -98,7 +98,7 @@ function +vi-git-stash()
         if (( $stashCount == 1 )); then
             stashCount=''
         fi
-        hook_com[misc]+="$PR_BLUE│$PR_MAGENTA$stashCount$PR_STASH"
+        hook_com[misc]+="$pr[lineColor]│$pr[magenta]$stashCount$pr[stashSymbol]"
     fi
 }
 
@@ -123,23 +123,23 @@ function git-ahead-behind()
         integer behind=$(git rev-list HEAD..$remote 2>/dev/null | wc -l)
 
         if (( $ahead > 0 )); then
-            hook_com[misc]+="$PR_BLUE│$PR_YELLOW$PR_BRANCHAHEAD$ahead"
+            hook_com[misc]+="$pr[lineColor]│$pr[yellow]$pr[aheadSymbol]$ahead"
         fi
 
         if (( $behind > 0 )); then
-            hook_com[misc]+="$PR_BLUE│$PR_YELLOW$PR_BRANCHBEHIND$behind"
+            hook_com[misc]+="$pr[lineColor]│$pr[yellow]$pr[behindSymbol]$behind"
         fi
     fi
 }
 
 function precmd()
 {
-    integer cmd_seconds
-    (( cmd_seconds = $SECONDS - ${PR_LASTCMDSTART:=$SECONDS} ))
-    PR_LASTCMDSTART=""
-    PR_CMDRUNTIME=""
-    if (( $cmd_seconds > 7 && $TTYIDLE > 7 )); then
-        PR_CMDRUNTIME="$PR_TIMEINDICATOR $(elapsedTimeFormat $cmd_seconds)
+    integer cmdSeconds
+    (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
+    pr[lastCmdStart]=""
+    pr[cmdRunTime]=""
+    if (( $cmdSeconds > 7 && $TTYIDLE > 7 )); then
+        pr[cmdRunTime]="$pr[timeSymbol] $(elapsedTimeFormat $cmdSeconds)
 "
     fi
 
@@ -148,80 +148,82 @@ function precmd()
     integer maxPathLength
     (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
 
-    PR_PWD="${(%):-${vcs_info_msg_1_%%.}}"
-    PR_PWD=$(compressPath "$PR_PWD" $maxPathLength)
+    pr[pwd]="${(%):-${vcs_info_msg_1_%%.}}"
+    pr[pwd]=$(compressPath "$pr[pwd]" $maxPathLength)
 
     integer fillerLength
-    (( fillerLength = $maxPathLength - $(expandStripLength "$PR_PWD") ))
-    PR_FILLER="\${(l.$fillerLength..─.)}"
+    (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
+    pr[fillBar]="${(e):-${(l.$fillerLength..─.)}}"
 
-    if [[ "${(%):-%n@%m}" != "$PR_DEFAULT_USER" ]] || [[ -n "$SSH_TTY" ]]; then
-        PR_USERORTIME="$PR_GREEN%n$PR_CYAN@%m"
+    if [[ "${(%):-%n@%m}" != "$pr[defaultUser]" ]] || [[ -n "$SSH_TTY" ]]; then
+        pr[userOrTime]="$pr[green]%n$pr[cyan]@%m"
     else
-        PR_USERORTIME="$PR_GREEN%D{%H:%M}"
+        pr[userOrTime]="$pr[green]%D{%H:%M}"
     fi
 }
 
 function setprompt()
 {
     setopt PROMPT_SUBST
+    autoload -U colors && colors
 
-    autoload colors zsh/terminfo
-    if [[ "$terminfo[colors]" -ge 8 ]]; then
-        colors
-    fi
-    for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
-        eval PR_$color='%{$fg[${(L)color}]%}'
+    # Store all prompt components in an associative array.
+    typeset -Ag pr
+
+    pr[reset]="%{$reset_color%}"
+    for color in red green yellow blue magenta cyan white; do
+        pr[$color]="%{$fg[$color]%}"
     done
-    PR_RESET="%{$terminfo[sgr0]%}"
+    pr[lineColor]=$pr[blue]
 
     # Virtual consoles don't support Unicode fanciness.
     if [[ "$TERM" == xterm* || ("$TERM" = "screen" && (-n "$DISPLAY" || -n "$SSH_TTY")) ]]; then
-        local PR_LEFTCORNER='╭'
-        local PR_RIGHTCORNER='╮'
-        local PR_PROMPTCHAR='❱'
-        local PR_MINUSPLUS='∓'
-        PR_TIMEINDICATOR='⌛'
-        PR_RETURNINDICATOR='↳'
-        PR_BRANCHAHEAD='↥'
-        PR_BRANCHBEHIND='↧'
-        PR_STASH='↶'
+        pr[leftCorner]='╭'
+        pr[rightCorner]='╮'
+        pr[promptSymbol]='❱'
+        pr[modifiedSymbol]='±'
+        pr[stagedSymbol]='∓'
+        pr[timeSymbol]='⌛'
+        pr[returnSymbol]='↳'
+        pr[aheadSymbol]='↥'
+        pr[behindSymbol]='↧'
+        pr[stashSymbol]='↶'
     else
-        local PR_LEFTCORNER='┌'
-        local PR_RIGHTCORNER='┐'
-        local PR_PROMPTCHAR='>'
-        local PR_MINUSPLUS='±'
-        PR_TIMEINDICATOR='Runtime:'
-        PR_RETURNINDICATOR='Returned:'
-        PR_BRANCHAHEAD='+'
-        PR_BRANCHBEHIND='-'
-        PR_STASH='#'
+        pr[leftCorner]='┌'
+        pr[rightCorner]='┐'
+        pr[promptSymbol]='>'
+        pr[modifiedSymbol]='±'
+        pr[stagedSymbol]='±'
+        pr[timeSymbol]='Runtime:'
+        pr[returnSymbol]='Returned:'
+        pr[aheadSymbol]='+'
+        pr[behindSymbol]='-'
+        pr[stashSymbol]='#'
     fi
 
     autoload -Uz vcs_info
-    local PR_BRANCHFORMAT="%u%c$PR_GREEN%b%m"
-    local PR_PATHFORMAT="%R$PR_YELLOW/%S"
+    local vcsBranchFormat="%u%c$pr[green]%b%m"
+    local vcsPathFormat="%R$pr[yellow]/%S"
 
     zstyle ':vcs_info:*' enable git svn
     zstyle ':vcs_info:*' check-for-changes true
     zstyle ':vcs_info:git+set-message:*' hooks git-ahead-behind git-stash
     zstyle ':vcs_info:git-svn+set-message:*' hooks git-svn-ahead-behind git-stash
-    zstyle ':vcs_info:*' unstagedstr   "$PR_RED%B±%b"
-    zstyle ':vcs_info:*' stagedstr     "$PR_YELLOW%B$PR_MINUSPLUS%b"
-    zstyle ':vcs_info:svn*' branchformat  "%b$PR_YELLOW@%r"
-    zstyle ':vcs_info:*' actionformats "┤$PR_CYAN%B%a%%b$PR_BLUE│$PR_BRANCHFORMAT$PR_BLUE├" "$PR_PATHFORMAT"
-    zstyle ':vcs_info:*' formats       "┤$PR_BRANCHFORMAT$PR_BLUE├" "$PR_PATHFORMAT"
+    zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B$pr[modifiedSymbol]%b"
+    zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B$pr[stagedSymbol]%b"
+    zstyle ':vcs_info:svn*' branchformat  "%b$pr[yellow]@%r"
+    zstyle ':vcs_info:*' actionformats "┤$pr[cyan]%B%a%%b$pr[lineColor]│$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
+    zstyle ':vcs_info:*' formats       "┤$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
     zstyle ':vcs_info:*' nvcsformats   "" "%d"
 
-    PROMPT="       %(?..$PR_RED%B\$PR_RETURNINDICATOR \$? %b)$PR_YELLOW\${PR_CMDRUNTIME:-%(?..
+    PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
-$PR_BLUE$PR_LEFTCORNER──$PR_USER┤$PR_WHITE%B\$PR_PWD%b$PR_BLUE├─\
-\${(e)PR_FILLER}\$vcs_info_msg_0_$PR_BLUE──$PR_RIGHTCORNER
-$PR_BLUE│\$PR_USERORTIME $PR_YELLOW%B$PR_PROMPTCHAR%b$PR_RESET "
+$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B\$pr[pwd]%b$pr[lineColor]├─\$pr[fillBar]\$vcs_info_msg_0_$pr[lineColor]──$pr[rightCorner]
+│\$pr[userOrTime] $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
 
-    RPROMPT="$PR_BLUE│$PR_RESET"
+    RPROMPT="$pr[lineColor]│$pr[reset]"
 
-    PROMPT2="$PR_BLUE│$PR_GREEN%_ $PR_YELLOW%B$PR_PROMPTCHAR%b$PR_RESET "
+    PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT2=$RPROMPT
 }
