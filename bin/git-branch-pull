@@ -1,19 +1,90 @@
 #! /bin/sh
 
-if [ x$1 = x ]; then
-    destBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+usage() {
+    cat << EOF
+Usage:
+    git branch-pull [--ff-only|--rebase|--merge] [<remote-branch>]
+        Fetches the latest changes to <remote-branch> and integrates them into
+        the current branch. If <remote-branch> is omitted, it defaults to the
+        current branch's upstream.
+
+        --ff-only
+            Only attempt a fast-forward merge.
+
+        --rebase
+            Rebase local commits on top of the remote branch. This is the
+            default behaviour.
+
+        --merge
+            Merges the remote branch into the current branch.
+EOF
+}
+
+fail() {
+    echo $@ 1>&2
+    exit 1
+}
+
+case "$1" in
+--rebase)
+    shift
+    ;;
+--ff-only)
+    ffOnlyMode="true"
+    shift
+    ;;
+--merge)
+    mergeMode="true"
+    shift
+    ;;
+--help|-h)
+    usage
+    exit 0
+    ;;
+-*)
+    echo "Unrecognized option: \"$1\"" 1>&2
+    usage
+    exit 1
+esac
+
+if [ -z "$1" ]; then
+    remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
+    if [ $? -ne 0 ]; then
+        fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
+    fi
 else
-    destBranch=$1
+    remoteBranch=$1
 fi
 
-case "$destBranch" in
-*/*)
-    remote=$(echo $destBranch | cut -d'/' -f1)
-    branch=$(echo $destBranch | cut -d'/' -f2)
-    git fetch $remote $branch && git rebase --autostash $destBranch
-    ;;
-*)
-    git rebase --autostash $destBranch
-    ;;
-esac
+if [ -n "$2" ]; then
+    usage
+    exit 1
+fi
+
+remote=$(echo $remoteBranch | cut -d'/' -f1)
+branch=$(echo $remoteBranch | sed "s:^$remote/::")
+
+if [ "$remote/$branch" != "$remoteBranch" ]; then
+    fail "\"$remoteBranch\" isn't in the format \"<remote>/<branch>\""
+fi
+
+if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; then
+    fail "\"$remote\" doesn't appear to be a valid remote."
+fi
+
+git fetch $remote $branch || exit 1
+
+headHash="$(git rev-parse HEAD)"
+remoteHash="$(git rev-parse $remoteBranch)"
+mergeBase="$(git merge-base HEAD "$remoteBranch")"
+if [ "$ffOnlyMode" = "true" -o "$mergeBase" = "$headHash" ]; then
+    git merge --ff-only $remoteBranch
+elif [ "$mergeBase" = "$remoteHash" ]; then
+    echo "Already up to date."
+elif [ "$mergeMode" = "true" ]; then
+    git merge $remoteBranch
+else
+    git rebase --autostash $remoteBranch
+fi
+exit $?
 

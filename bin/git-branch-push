@@ -1,16 +1,88 @@
 #! /bin/sh
 
-if [ x$1 = x ]; then
-    remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+usage() {
+    cat << EOF
+Usage:
+    git branch-push [<remote-branch>]
+        Pushes HEAD to the <remote-branch>. If <remote-branch> is omitted,
+        it defaults to the current branch's upstream. Either way, <remote
+        -branch> must exist.
+
+    git branch-push --create <remote-branch>
+        Creates <remote-branch> on the remote and pushes HEAD to it.
+
+    git branch-push --delete <remote-branch>
+        Deletes <remote-branch> on the remote.
+EOF
+}
+
+fail() {
+    echo $@ 1>&2
+    exit 1
+}
+
+case "$1" in
+--create|-c)
+    createMode="true"
+    shift
+    ;;
+--delete|-d)
+    deleteMode="true"
+    shift
+    ;;
+--help|-h)
+    usage
+    exit 0
+    ;;
+-*)
+    echo "Unrecognized option: \"$1\"" 1>&2
+    usage
+    exit 1
+esac
+
+if [ -z "$1" ]; then
+    if [ "$createMode" = "true" -o "$deleteMode" = "true" ]; then
+        usage
+        exit 1
+    fi
+    remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
+    if [ $? -ne 0 ]; then
+        fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
+    fi
 else
     remoteBranch=$1
 fi
 
-remote=$(echo $remoteBranch | cut -d'/' -f1)
-branch=$(echo $remoteBranch | cut -d'/' -f2)
-
-if [ "$remote/$branch" = "$remoteBranch" ] && git show-branch $remoteBranch >/dev/null; then
-    git push $remote HEAD:$branch
-else
-    echo Problem with $remoteBranch.
+if [ -n "$2" ]; then
+    usage
+    exit 1
 fi
+
+remote=$(echo $remoteBranch | cut -d'/' -f1)
+branch=$(echo $remoteBranch | sed "s:^$remote/::")
+
+if [ "$remote/$branch" != "$remoteBranch" ]; then
+    fail "\"$remoteBranch\" isn't in the format \"<remote>/<branch>\""
+fi
+
+if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; then
+    fail "\"$remote\" doesn't appear to be a valid remote."
+fi
+
+if git show-branch $remoteBranch > /dev/null 2>&1; then
+    remoteBranchExists="true"
+fi
+
+if [ "$createMode" = "true" -a "$remoteBranchExists" = "true" ]; then
+    fail "Remote branch \"$remoteBranch\" already exists."
+elif [ "$createMode" != "true" -a "$remoteBranchExists" != "true" ]; then
+    fail "Remote branch \"$remoteBranch\" does not exist."
+fi
+
+if [ "$deleteMode" = "true" ]; then
+    git push $remote --delete $branch
+else
+    git push $remote HEAD:$branch
+fi
+
+exit $?
