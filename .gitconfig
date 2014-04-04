@@ -69,3 +69,6 @@
 
 [rerere]
 	enabled = true
+
+[init]
+	templatedir = ~/.gittemplates
