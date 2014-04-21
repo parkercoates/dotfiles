@@ -8,6 +8,10 @@ Usage:
         it defaults to the current branch's upstream. Either way, <remote
         -branch> must exist.
 
+    git branch-push --force <remote-branch>
+        Force pushes HEAD to the <remote-branch>. <remote-branch> must be
+        specified and must exist.
+
     git branch-push --create <remote-branch>
         Creates <remote-branch> on the remote and pushes HEAD to it.
 
@@ -22,6 +26,10 @@ fail() {
 }
 
 case "$1" in
+--force)
+    forceMode="true"
+    shift
+    ;;
 --create|-c)
     createMode="true"
     shift
@@ -41,7 +49,7 @@ case "$1" in
 esac
 
 if [ -z "$1" ]; then
-    if [ "$createMode" = "true" -o "$deleteMode" = "true" ]; then
+    if [ "$forceMode" = "true" -o "$createMode" = "true" -o "$deleteMode" = "true" ]; then
         usage
         exit 1
     fi
@@ -81,6 +89,8 @@ fi
 
 if [ "$deleteMode" = "true" ]; then
     git push $remote --delete $branch
+elif [ "$forceMode" = "true" ]; then
+    git push --force $remote HEAD:$branch
 else
     git push $remote HEAD:$branch
 fi
