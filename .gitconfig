@@ -55,6 +55,7 @@
 
 [alias]
 	plog = log --graph --format=format:'%C(bold blue)%h%Creset%C(bold magenta)%d%Creset %C(green)%an%Creset %s %C(yellow)(%cr)'
+	last-week = log --all --author=coates --since=8.days.ago --date-order --reverse --format=format:'%C(yellow)(%ar)%Creset %s'
 	ignored = ls-files -o -i --exclude-standard
 	st = status --short
 	unadd = reset HEAD
