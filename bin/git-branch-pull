@@ -72,19 +72,31 @@ if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; t
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
-git fetch $remote $branch || exit 1
+echo Fetching:
+git fetch $remote || exit 1
 
 headHash="$(git rev-parse HEAD)"
 remoteHash="$(git rev-parse $remoteBranch)"
 mergeBase="$(git merge-base HEAD "$remoteBranch")"
-if [ "$ffOnlyMode" = "true" -o "$mergeBase" = "$headHash" ]; then
-    git merge --ff-only $remoteBranch
-elif [ "$mergeBase" = "$remoteHash" ]; then
+if [ "$mergeBase" = "$remoteHash" ]; then
     echo "Already up to date."
-elif [ "$mergeMode" = "true" ]; then
-    git merge $remoteBranch
 else
-    git rebase --autostash $remoteBranch
+    echo
+    echo Incoming commits:
+    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $headHash..$remoteHash
+    echo
+    echo
+    echo Files changed:
+    git --no-pager diff --stat $headHash..$remoteHash
+    echo
+
+    if [ "$ffOnlyMode" = "true" -o "$mergeBase" = "$headHash" ]; then
+        git merge --ff-only $remoteBranch
+    elif [ "$mergeMode" = "true" ]; then
+        git merge $remoteBranch
+    else
+        git rebase --autostash $remoteBranch
+    fi
 fi
 exit $?
 
