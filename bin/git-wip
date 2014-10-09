@@ -6,7 +6,7 @@ wip!*)
     ;;
 *)
     if [ "$1" != "-i" -a "$1" != "--index-only" ]; then
-        git add -A
+        git add -A :/
         git ls-files --deleted -z | xargs -0r git rm
     fi
     git commit -m "wip!"
