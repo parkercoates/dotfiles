@@ -67,6 +67,7 @@
 	bpull = branch-pull
 	bfetch = branch-pull --fetch-only
 	bpush = branch-push
+	bpushp = branch-push --prompt
 	wipi = wip --index-only
 
 [merge "ours"]
