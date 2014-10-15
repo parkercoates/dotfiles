@@ -65,6 +65,7 @@
 	unstage = reset HEAD
 	qr = quick-rebase
 	bpull = branch-pull
+	bfetch = branch-pull --fetch-only
 	bpush = branch-push
 	wipi = wip --index-only
 
