@@ -1,10 +1,24 @@
 [user]
-	name = Parker Coates
 	email = coates@qps.nl
+	name = Parker Coates
 
 [advice]
-	statusHints = false
 	detachedHead = false
+	statusHints = false
+
+[alias]
+	bfetch = branch-pull --fetch-only
+	bpull = branch-pull
+	bpush = branch-push
+	bpushp = branch-push --prompt
+	ignored = ls-files -o -i --exclude-standard
+	last-week = log --all --author=coates --since=8.days.ago --date-order --reverse --format=format:'%C(yellow)(%ar)%Creset %s'
+	plog = log --graph --format=format:'%C(bold blue)%h%Creset%C(bold magenta)%d%Creset %C(green)%an%Creset %s %C(yellow)(%cr)'
+	qr = quick-rebase
+	st = status --short
+	unadd = reset HEAD
+	unstage = reset HEAD
+	wipi = wip --index-only
 
 [branch]
 	autosetuprebase = always
@@ -17,24 +31,29 @@
 	ui = true
 
 [core]
+	autocrlf = input
 	excludesfile = ~/.gitignore-global
 #	pager = less $LESS -FRXS
 	whitespace = blank-at-eol,space-before-tab,tab-in-indent,blank-at-eof
-	autocrlf = input
 
+[credential]
+	helper = cache --timeout=10800
 
 [diff]
-	tool = kompare
 	mnemonicprefix = true
 	renames = copies
+	tool = kompare
 
 [fetch]
 	prune = true
 
 [gui]
+	diffcontext = 6
 	editor = kate
 	historybrowser = gitk
-	diffcontext = 6
+
+[init]
+	templatedir = ~/.gittemplates
 
 [log]
 	date = iso
@@ -43,6 +62,9 @@
 [merge]
 	tool = kdiff3
 
+[merge "ours"]
+	driver = true
+
 [push]
 	default = simple
 
@@ -50,34 +72,12 @@
 	autosquash = true
 	autostash = true
 
+[rerere]
+	enabled = true
+
 [url "git://anongit.kde.org/"]
 	insteadOf = kde:
 
 [url "git@git.kde.org:"]
 	pushInsteadOf = kde:
 
-[alias]
-	plog = log --graph --format=format:'%C(bold blue)%h%Creset%C(bold magenta)%d%Creset %C(green)%an%Creset %s %C(yellow)(%cr)'
-	last-week = log --all --author=coates --since=8.days.ago --date-order --reverse --format=format:'%C(yellow)(%ar)%Creset %s'
-	ignored = ls-files -o -i --exclude-standard
-	st = status --short
-	unadd = reset HEAD
-	unstage = reset HEAD
-	qr = quick-rebase
-	bpull = branch-pull
-	bfetch = branch-pull --fetch-only
-	bpush = branch-push
-	bpushp = branch-push --prompt
-	wipi = wip --index-only
-
-[merge "ours"]
-	driver = true
-
-[rerere]
-	enabled = true
-
-[credential]
-	helper = cache --timeout=10800
-
-[init]
-	templatedir = ~/.gittemplates
