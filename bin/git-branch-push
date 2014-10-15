@@ -33,19 +33,19 @@ fail() {
 
 case "$1" in
 --prompt)
-    promptMode="true"
+    promptMode='true'
     shift;
     ;;
 --force)
-    forceMode="true"
+    forceMode='true'
     shift
     ;;
 --create|-c)
-    createMode="true"
+    createMode='true'
     shift
     ;;
 --delete|-d)
-    deleteMode="true"
+    deleteMode='true'
     shift
     ;;
 --help|-h)
@@ -58,11 +58,11 @@ esac
 
 case "$1" in
 -*)
-    fail "Only one option may be given at a time."
+    fail 'Only one option may be given at a time.'
 esac
 
 if [ -z "$1" ]; then
-    if [ "$forceMode" = "true" -o "$createMode" = "true" -o "$deleteMode" = "true" ]; then
+    if [ "$forceMode" = 'true' -o "$createMode" = 'true' -o "$deleteMode" = 'true' ]; then
         usage 1
     fi
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
@@ -89,45 +89,45 @@ if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; t
 fi
 
 if git show-branch $remoteBranch > /dev/null 2>&1; then
-    remoteBranchExists="true"
+    remoteBranchExists='true'
 fi
 
-if [ "$createMode" = "true" -a "$remoteBranchExists" = "true" ]; then
+if [ "$createMode" = 'true' -a "$remoteBranchExists" = 'true' ]; then
     fail "Remote branch \"$remoteBranch\" already exists."
-elif [ "$createMode" != "true" -a "$remoteBranchExists" != "true" ]; then
+elif [ "$createMode" != 'true' -a "$remoteBranchExists" != 'true' ]; then
     fail "Remote branch \"$remoteBranch\" does not exist."
 fi
 
-if [ "$createMode" != "true" -a "$deleteMode" != "true" ]; then
+if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
     headHash="$(git rev-parse HEAD)"
     remoteHash="$(git rev-parse $remoteBranch)"
     if [ "$headHash" = "$remoteHash" ]; then
-        echo "Nothing to push."
+        echo 'Nothing to push.'
         exit 0
     fi
 
-    echo "Commits to push:"
+    echo 'Commits to push:'
     git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$headHash
     echo
     echo
-    echo "Files changed:"
+    echo 'Files changed:'
     git --no-pager diff --stat $remoteHash..$headHash
     echo
 fi
 
-if [ "$promptMode" == "true" ]; then
-    echo -n "Continue with push? (y/N) "
+if [ "$promptMode" == 'true' ]; then
+    echo -n 'Continue with push? (y/N) '
     read -n 1 answer
     echo
-    if [ "$answer" != "y" -a "$answer" != "Y" ]; then
+    if [ "$answer" != 'y' -a "$answer" != 'Y' ]; then
         exit 0
     fi
     echo
 fi
 
-if [ "$deleteMode" = "true" ]; then
+if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
-elif [ "$forceMode" = "true" ]; then
+elif [ "$forceMode" = 'true' ]; then
     git push --force $remote HEAD:$branch
 else
     git push $remote HEAD:$branch

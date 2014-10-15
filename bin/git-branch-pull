@@ -31,18 +31,18 @@ fail() {
 
 case "$1" in
 --fetch-only)
-    fetchOnlyMode="true"
+    fetchOnlyMode='true'
     shift
     ;;
 --ff-only)
-    ffOnlyMode="true"
+    ffOnlyMode='true'
     shift
     ;;
 --rebase)
     shift
     ;;
 --merge)
-    mergeMode="true"
+    mergeMode='true'
     shift
     ;;
 --help|-h)
@@ -55,7 +55,7 @@ esac
 
 case "$1" in
 -*)
-    fail "Only one option may be given at a time."
+    fail 'Only one option may be given at a time.'
 esac
 
 if [ -z "$1" ]; then
@@ -82,28 +82,28 @@ if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; t
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
-echo Fetching:
+echo 'Fetching:'
 git fetch $remote || exit 1
 
 headHash="$(git rev-parse HEAD)"
 remoteHash="$(git rev-parse $remoteBranch)"
 mergeBase="$(git merge-base HEAD "$remoteBranch")"
 if [ "$mergeBase" = "$remoteHash" ]; then
-    echo "Already up to date."
+    echo 'Already up to date.'
 else
     echo
-    echo "Incoming commits:"
+    echo 'Incoming commits:'
     git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $mergeBase..$remoteHash
     echo
     echo
-    echo "Files changed:"
+    echo 'Files changed:'
     git --no-pager diff --stat $mergeBase..$remoteHash
     echo
 
-    if [ "$fetchOnlyMode" != "true" ]; then
-        if [ "$ffOnlyMode" = "true" -a "$mergeBase" != "$headHash" ]; then
-            fail "Fast forward merge not possible"
-        elif [ "$mergeMode" = "true" ]; then
+    if [ "$fetchOnlyMode" != 'true' ]; then
+        if [ "$ffOnlyMode" = 'true' -a "$mergeBase" != "$headHash" ]; then
+            fail 'Fast forward merge not possible.'
+        elif [ "$mergeMode" = 'true' ]; then
             git merge $remoteBranch
         else
             git rebase --autostash $remoteBranch
