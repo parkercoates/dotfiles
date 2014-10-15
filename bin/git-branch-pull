@@ -8,6 +8,9 @@ Usage:
         the current branch. If <remote-branch> is omitted, it defaults to the
         current branch's upstream.
 
+        --fetch-only
+            Fetch the lastest changes, without integrating them.
+
         --ff-only
             Only attempt a fast-forward merge.
 
@@ -27,6 +30,10 @@ fail() {
 
 case "$1" in
 --rebase)
+    shift
+    ;;
+--fetch-only)
+    fetchOnlyMode="true"
     shift
     ;;
 --ff-only)
@@ -90,13 +97,15 @@ else
     git --no-pager diff --stat $mergeBase..$remoteHash
     echo
 
-    if [ "$ffOnlyMode" = "true" -o "$mergeBase" = "$headHash" ]; then
-        git merge --ff-only $remoteBranch
-    elif [ "$mergeMode" = "true" ]; then
-        git merge $remoteBranch
-    else
-        git rebase --autostash $remoteBranch
+    if [ "$fetchOnlyMode" != "true" ]; then
+        if [ "$ffOnlyMode" = "true" -a "$mergeBase" != "$headHash" ]; then
+            fail "Fast forward merge not possible"
+        elif [ "$mergeMode" = "true" ]; then
+            git merge $remoteBranch
+        else
+            git rebase --autostash $remoteBranch
+        fi
+        exit $?
     fi
 fi
-exit $?
 
