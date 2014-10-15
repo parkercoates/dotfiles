@@ -82,12 +82,12 @@ if [ "$mergeBase" = "$remoteHash" ]; then
     echo "Already up to date."
 else
     echo
-    echo Incoming commits:
-    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $headHash..$remoteHash
+    echo "Incoming commits:"
+    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $mergeBase..$remoteHash
     echo
     echo
-    echo Files changed:
-    git --no-pager diff --stat $headHash..$remoteHash
+    echo "Files changed:"
+    git --no-pager diff --stat $mergeBase..$remoteHash
     echo
 
     if [ "$ffOnlyMode" = "true" -o "$mergeBase" = "$headHash" ]; then
