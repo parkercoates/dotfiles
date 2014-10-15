@@ -89,7 +89,29 @@ fi
 
 if [ "$deleteMode" = "true" ]; then
     git push $remote --delete $branch
-elif [ "$forceMode" = "true" ]; then
+    exit $?
+elif [ "$createMode" = "true" ]; then
+    git push $remote HEAD:$branch
+    exit $?
+fi
+
+headHash="$(git rev-parse HEAD)"
+remoteHash="$(git rev-parse $remoteBranch)"
+if [ "$headHash" = "$remoteHash" ]; then
+    echo "Nothing to push."
+    exit 0
+fi
+
+echo
+echo "Commits to push:"
+git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$headHash
+echo
+echo
+echo "Files changed:"
+git --no-pager diff --stat $remoteHash..$headHash
+echo
+
+if [ "$forceMode" = "true" ]; then
     git push --force $remote HEAD:$branch
 else
     git push $remote HEAD:$branch
