@@ -28,6 +28,9 @@
 	mnemonicprefix = true
 	renames = copies
 
+[fetch]
+	prune = true
+
 [gui]
 	editor = kate
 	historybrowser = gitk
