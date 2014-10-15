@@ -8,6 +8,11 @@ Usage:
         it defaults to the current branch's upstream. Either way, <remote
         -branch> must exist.
 
+    git branch-push --prompt [<remote-branch>]
+        The same as above, but after the list of changes to push is shown,
+        the user is prompted as to whether they wish to continue with the
+        push. Mostly useful for previewing unpushed work.
+
     git branch-push --force <remote-branch>
         Force pushes HEAD to the <remote-branch>. <remote-branch> must be
         specified and must exist.
@@ -26,6 +31,10 @@ fail() {
 }
 
 case "$1" in
+--prompt)
+    promptMode="true"
+    shift;
+    ;;
 --force)
     forceMode="true"
     shift
@@ -87,31 +96,36 @@ elif [ "$createMode" != "true" -a "$remoteBranchExists" != "true" ]; then
     fail "Remote branch \"$remoteBranch\" does not exist."
 fi
 
+if [ "$createMode" != "true" -a "$deleteMode" != "true" ]; then
+    headHash="$(git rev-parse HEAD)"
+    remoteHash="$(git rev-parse $remoteBranch)"
+    if [ "$headHash" = "$remoteHash" ]; then
+        echo "Nothing to push."
+        exit 0
+    fi
+
+    echo "Commits to push:"
+    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$headHash
+    echo
+    echo
+    echo "Files changed:"
+    git --no-pager diff --stat $remoteHash..$headHash
+    echo
+fi
+
+if [ "$promptMode" == "true" ]; then
+    echo -n "Continue with push? (y/N) "
+    read -n 1 answer
+    echo
+    if [ "$answer" != "y" -a "$answer" != "Y" ]; then
+        exit 0
+    fi
+    echo
+fi
+
 if [ "$deleteMode" = "true" ]; then
     git push $remote --delete $branch
-    exit $?
-elif [ "$createMode" = "true" ]; then
-    git push $remote HEAD:$branch
-    exit $?
-fi
-
-headHash="$(git rev-parse HEAD)"
-remoteHash="$(git rev-parse $remoteBranch)"
-if [ "$headHash" = "$remoteHash" ]; then
-    echo "Nothing to push."
-    exit 0
-fi
-
-echo
-echo "Commits to push:"
-git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$headHash
-echo
-echo
-echo "Files changed:"
-git --no-pager diff --stat $remoteHash..$headHash
-echo
-
-if [ "$forceMode" = "true" ]; then
+elif [ "$forceMode" = "true" ]; then
     git push --force $remote HEAD:$branch
 else
     git push $remote HEAD:$branch
