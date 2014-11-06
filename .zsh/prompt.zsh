@@ -107,12 +107,23 @@ function +vi-git-misc()
     # Clear %m before sticking my own stuff in there.
     hook_com[misc]=''
 
+
+    # Add rebase progress to %a when rebasing.
+    if [[ -n "$hook_com[action]" ]]; then
+        local gitRebaseDir="$(git rev-parse --git-dir)/rebase-merge"
+        local numFile="$gitRebaseDir/msgnum"
+        local endFile="$gitRebaseDir/end"
+        if [[ -f "$endFile" && -f "$numFile" ]]; then
+            hook_com[action]+="%b$pr[white] $(cat $numFile)/$(cat $endFile)"
+        fi
+    fi
+
     # Add conflicted file count.
     local conflictCount=$(git ls-files --unmerged 2>/dev/null | cut -f2 | uniq | wc -l)
     if (( $conflictCount > 0 )); then
         hook_com[misc]+="$pr[lineColor]│$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
     fi
-        
+
     # Add upstream ahead and behind counts.
     hook_com[misc]+=$(git-ahead-behind "@{upstream}")
 
