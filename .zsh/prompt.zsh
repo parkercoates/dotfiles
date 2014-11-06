@@ -102,6 +102,11 @@ function elapsedTimeFormat()
     echo "$minutes${seconds}s"
 }
 
+function +vi-git-clear-misc()
+{
+    hook_com[misc]=''
+}
+
 function +vi-git-stash()
 {
     local stashCount=$(git stash list 2>/dev/null | wc -l)
@@ -229,7 +234,7 @@ function setprompt()
 
     zstyle ':vcs_info:*' enable git svn
     zstyle ':vcs_info:*' check-for-changes true
-    zstyle ':vcs_info:git+set-message:*' hooks git-conflicts git-ahead-behind git-stash
+    zstyle ':vcs_info:git+set-message:*' hooks git-clear-misc git-conflicts git-ahead-behind git-stash
     zstyle ':vcs_info:git-svn+set-message:*' hooks git-svn-ahead-behind git-stash
     zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B$pr[modifiedSymbol]%b"
     zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B$pr[stagedSymbol]%b"
