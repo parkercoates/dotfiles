@@ -17,11 +17,18 @@ function expandStripLength()
 
 function compressPath()
 {
+    integer newLength;
+    newLength=$2
+    if (( $newLength <= 0 )); then
+        echo ""
+        return
+    fi
+
     # Replace $HOME by ~.
     local newPath="${1/$HOME/~}"
 
-    (( charsToRemove = $(expandStripLength $newPath) - $2 ))
     integer charsToRemove=0
+    (( charsToRemove = $(expandStripLength $newPath) - $newLength ))
 
     if (( $charsToRemove > 0 )); then
 
@@ -64,7 +71,7 @@ function compressPath()
         # If we're still not short enough...
         if (( $charsToRemove >  0 )); then
             # Chop of the start
-            newPath="${newPath[-$2,-1]}"
+            newPath="${newPath[-$newLength,-1]}"
 
             # If the resulting path contains an elipsis, drop everything before
             # it, otherwise replace the first character with an elipsis.
