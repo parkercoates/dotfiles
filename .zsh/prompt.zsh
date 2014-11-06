@@ -116,7 +116,7 @@ function +vi-git-conflicts()
 
 function +vi-git-ahead-behind()
 {
-    git-ahead-behind "$hook_com[branch]@{upstream}"
+    git-ahead-behind "@{upstream}"
 }
 
 function +vi-git-svn-ahead-behind()
