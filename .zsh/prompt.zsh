@@ -102,13 +102,21 @@ function elapsedTimeFormat()
     echo "$minutes${seconds}s"
 }
 
-function +vi-git-clear-misc()
+function +vi-git-misc()
 {
+    # Clear %m before sticking my own stuff in there.
     hook_com[misc]=''
-}
 
-function +vi-git-stash()
-{
+    # Add conflicted file count.
+    local conflictCount=$(git ls-files --unmerged 2>/dev/null | cut -f2 | uniq | wc -l)
+    if (( $conflictCount > 0 )); then
+        hook_com[misc]+="$pr[lineColor]│$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
+    fi
+        
+    # Add upstream ahead and behind counts.
+    hook_com[misc]+=$(git-ahead-behind "@{upstream}")
+
+    # Add the stash count.
     local stashCount=$(git stash list 2>/dev/null | wc -l)
     if (( $stashCount > 0 )); then
         if (( $stashCount == 1 )); then
@@ -116,19 +124,6 @@ function +vi-git-stash()
         fi
         hook_com[misc]+="$pr[lineColor]│$pr[magenta]$stashCount$pr[stashSymbol]"
     fi
-}
-
-function +vi-git-conflicts()
-{
-    local conflictCount=$(git ls-files --unmerged 2>/dev/null | cut -f2 | uniq | wc -l)
-    if (( $conflictCount > 0 )); then
-        hook_com[misc]+="$pr[lineColor]│$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
-    fi
-}
-
-function +vi-git-ahead-behind()
-{
-    hook_com[misc]+=$(git-ahead-behind "@{upstream}")
 }
 
 function +vi-git-svn-ahead-behind()
@@ -234,7 +229,7 @@ function setprompt()
 
     zstyle ':vcs_info:*' enable git svn
     zstyle ':vcs_info:*' check-for-changes true
-    zstyle ':vcs_info:git+set-message:*' hooks git-clear-misc git-conflicts git-ahead-behind git-stash
+    zstyle ':vcs_info:git+set-message:*' hooks git-misc
     zstyle ':vcs_info:git-svn+set-message:*' hooks git-svn-ahead-behind git-stash
     zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B$pr[modifiedSymbol]%b"
     zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B$pr[stagedSymbol]%b"
