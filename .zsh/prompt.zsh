@@ -244,3 +244,4 @@ $pr[lineColor]$pr[leftCorner]──┤$pr[white]%B\$pr[pwd]%b$pr[lineColor]├�
 }
 
 setprompt
+unfunction setprompt
