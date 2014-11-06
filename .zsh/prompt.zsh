@@ -20,8 +20,8 @@ function compressPath()
     # Replace $HOME by ~.
     local newPath="${1/$HOME/~}"
 
-    local integer charsToRemove
     (( charsToRemove = $(expandStripLength $newPath) - $2 ))
+    integer charsToRemove=0
 
     if (( $charsToRemove > 0 )); then
 
@@ -45,7 +45,7 @@ function compressPath()
             local dot=${stripped%%$compressible}
 
             if (( ${#compressible} > 1 )); then
-                local integer charsToKeep
+                integer charsToKeep
                 (( charsToKeep = ${#compressible} - $charsToRemove - 1 ))
                 if (( $charsToKeep < 1 )); then
                     charsToKeep=1
@@ -68,7 +68,7 @@ function compressPath()
 
             # If the resulting path contains an elipsis, drop everything before
             # it, otherwise replace the first character with an elipsis.
-            local integer firstElipsis=${newPath[(i)…]}
+            integer firstElipsis=${newPath[(i)…]}
             if (( $firstElipsis <= ${#newPath} )); then
                 newPath[1,$firstElipsis]="…"
             else
