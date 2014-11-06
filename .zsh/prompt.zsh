@@ -128,14 +128,14 @@ function +vi-git-conflicts()
 
 function +vi-git-ahead-behind()
 {
-    git-ahead-behind "@{upstream}"
+    hook_com[misc]+=$(git-ahead-behind "@{upstream}")
 }
 
 function +vi-git-svn-ahead-behind()
 {
     local svnBranch=$(git log -1 --first-parent --grep="^git-svn-id: "\
                       | perl -ne 'm/git-svn-id:.*\/(\w+)@\d+/; print $1')
-    git-ahead-behind "remotes/$svnBranch"
+    hook_com[misc]+=$(git-ahead-behind "remotes/$svnBranch")
 }
 
 function git-ahead-behind()
@@ -147,11 +147,11 @@ function git-ahead-behind()
         integer behind=$(git rev-list HEAD..$remote 2>/dev/null | wc -l)
 
         if (( $ahead > 0 )); then
-            hook_com[misc]+="$pr[lineColor]│$pr[yellow]$pr[aheadSymbol]$ahead"
+            echo -n "$pr[lineColor]│$pr[yellow]$pr[aheadSymbol]$ahead"
         fi
 
         if (( $behind > 0 )); then
-            hook_com[misc]+="$pr[lineColor]│$pr[yellow]$pr[behindSymbol]$behind"
+            echo -n "$pr[lineColor]│$pr[yellow]$pr[behindSymbol]$behind"
         fi
     fi
 }
