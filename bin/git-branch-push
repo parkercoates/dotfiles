@@ -116,6 +116,8 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
 fi
 
 if [ "$promptMode" == 'true' ]; then
+    echo -e "Destination branch: $(tput setaf 2)$remoteBranch$(tput sgr 0)"
+    echo
     echo -n 'Continue with push? (y/N) '
     read -n 1 answer
     echo
