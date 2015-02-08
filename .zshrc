@@ -38,8 +38,6 @@ source $ZSH/cdup.zsh
 
 source $ZSH/completion.zsh
 
-source $ZSH/edit-command-line.zsh
-
 source $ZSH/fasd.zsh
 
 source $ZSH/history.zsh
@@ -55,5 +53,5 @@ source $ZSH/history-substring-search/zsh-history-substring-search.zsh
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-
-
+# Sourcing this too early causes it to stop working. Not sure why.
+source $ZSH/edit-command-line.zsh
