@@ -38,6 +38,7 @@ case "$1" in
     ;;
 --force)
     forceMode='true'
+    promptMode='true'
     shift
     ;;
 --create|-c)
@@ -46,6 +47,7 @@ case "$1" in
     ;;
 --delete|-d)
     deleteMode='true'
+    promptMode='true'
     shift
     ;;
 --help|-h)
