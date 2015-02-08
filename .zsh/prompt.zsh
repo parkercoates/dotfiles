@@ -114,7 +114,7 @@ function +vi-git-misc()
         local numFile="$gitRebaseDir/msgnum"
         local endFile="$gitRebaseDir/end"
         if [[ -f "$endFile" && -f "$numFile" ]]; then
-            hook_com[action]+="%b$pr[white] $(cat $numFile)/$(cat $endFile)"
+            hook_com[action]+="%b$pr[cyan] $(cat $numFile)/$(cat $endFile)"
         fi
     fi
 
