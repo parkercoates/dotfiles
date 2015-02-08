@@ -58,7 +58,7 @@ function compressPath()
                     charsToKeep=1
                 fi
                 (( charsToRemove = $charsToRemove - ( ${#compressible} - ($charsToKeep + 1) ) ))
-                segments[$i]="$dot$compressible[0,$charsToKeep]…$escapes"
+                segments[$i]="$dot$compressible[0,$charsToKeep]$pr[elideSymbol]$escapes"
             fi
         done
 
@@ -75,11 +75,11 @@ function compressPath()
 
             # If the resulting path contains an elipsis, drop everything before
             # it, otherwise replace the first character with an elipsis.
-            integer firstElipsis=${newPath[(i)…]}
+            integer firstElipsis=${newPath[(i)$pr[elideSymbol]]}
             if (( $firstElipsis <= ${#newPath} )); then
-                newPath[1,$firstElipsis]="…"
+                newPath[1,$firstElipsis]="$pr[elideSymbol]"
             else
-                newPath[1]="…"
+                newPath[1]="$pr[elideSymbol]"
             fi
         fi
     fi
@@ -254,6 +254,7 @@ function setprompt()
         pr[behindSymbol]='↧'
         pr[stashSymbol]='↶'
         pr[conflictSymbol]='✖'
+        pr[elideSymbol]='…'
     else
         pr[leftCorner]='┌'
         pr[rightCorner]='┐'
@@ -266,6 +267,7 @@ function setprompt()
         pr[behindSymbol]='<'
         pr[stashSymbol]='$'
         pr[conflictSymbol]='!'
+        pr[elideSymbol]='_'
     fi
 
     # The temporary file where the first line of the prompt will be stored
@@ -300,7 +302,7 @@ function setprompt()
     # Set a placeholder info line until the first async subshell completes
     integer fillerLength
     (( fillerLength = $COLUMNS - 8 ))
-    pr[infoLine]="$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B…%b$pr[lineColor]├${(e):-${(l.$fillerLength..─.)}}$pr[rightCorner]"
+    pr[infoLine]="$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$pr[elideSymbol]%b$pr[lineColor]├${(e):-${(l.$fillerLength..─.)}}$pr[rightCorner]"
 }
 
 setprompt
