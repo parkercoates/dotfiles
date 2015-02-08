@@ -153,11 +153,11 @@ function git-ahead-behind()
         integer behind=$(git rev-list HEAD..$remote 2>/dev/null | wc -l)
 
         if (( $ahead > 0 )); then
-            echo -n "$pr[lineColor]│$pr[yellow]$pr[aheadSymbol]$ahead"
+            echo -n "$pr[lineColor]│$pr[yellow]$ahead$pr[aheadSymbol]"
         fi
 
         if (( $behind > 0 )); then
-            echo -n "$pr[lineColor]│$pr[yellow]$pr[behindSymbol]$behind"
+            echo -n "$pr[lineColor]│$pr[yellow]$behind$pr[behindSymbol]"
         fi
     fi
 }
