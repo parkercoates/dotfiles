@@ -239,9 +239,9 @@ function toggleUnicode()
         pr[stagedSymbol]='±'
         pr[timeSymbol]='Runtime:'
         pr[returnSymbol]='Returned:'
-        pr[aheadSymbol]='>'
-        pr[behindSymbol]='<'
-        pr[stashSymbol]='$'
+        pr[aheadSymbol]='^'
+        pr[behindSymbol]='v'
+        pr[stashSymbol]='@'
         pr[conflictSymbol]='!'
         pr[elideSymbol]='_'
     else
