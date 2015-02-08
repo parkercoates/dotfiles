@@ -170,8 +170,46 @@ function TRAPWINCH()
 }
 
 
+function TRAPUSR1()
+{
+    pr[infoLine]="$(< $pr[tempFile])"
+    pr[asyncPid]=0
+    zle && zle reset-prompt
+    rm "$pr[tempFile]"
+}
+
+
 function precmd()
 {
+    function asyncPromptInfo()
+    {
+        # Update VSC data
+        vcs_info
+
+        integer maxPathLength
+        (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
+        pr[pwd]=$(compressPath "${vcs_info_msg_1_%%.}" $maxPathLength)
+
+        integer fillerLength
+        (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
+        pr[fillBar]="${(e):-${(l.$fillerLength..─.)}}"
+
+        echo "$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$pr[pwd]%b$pr[lineColor]├─$pr[fillBar]$vcs_info_msg_0_──$pr[rightCorner]" >! "$pr[tempFile]"
+
+        # Signal parent
+        kill -s USR1 $$
+    }
+
+    # Kill previous subshell if it's still running
+    if [[ "$pr[asyncPid]" != 0 ]]; then
+        kill -s HUP $pr[asyncPid] >/dev/null 2>&1 || :
+    fi
+
+    # Launch subshell asynchronously and capture PID
+    asyncPromptInfo &!
+    pr[asyncPid]=$!
+
+
     integer cmdSeconds
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
     pr[lastCmdStart]=""
@@ -180,18 +218,6 @@ function precmd()
         pr[cmdRunTime]="$pr[timeSymbol] $(elapsedTimeFormat $cmdSeconds)
 "
     fi
-
-    vcs_info
-
-    integer maxPathLength
-    (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
-
-    pr[pwd]="${(%):-${vcs_info_msg_1_%%.}}"
-    pr[pwd]=$(compressPath "$pr[pwd]" $maxPathLength)
-
-    integer fillerLength
-    (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
-    pr[fillBar]="${(e):-${(l.$fillerLength..─.)}}"
 
     if [[ "${(%):-%n@%m}" != "$pr[defaultUser]" ]] || [[ -n "$SSH_TTY" ]]; then
         pr[userOrTime]="$pr[green]%n$pr[cyan]@%m"
@@ -242,6 +268,9 @@ function setprompt()
         pr[conflictSymbol]='!'
     fi
 
+    # The temporary file where the first line of the prompt will be stored
+    pr[tempFile]="$ZSH/prompt-info.tmp"
+
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
     local vcsPathFormat="%R$pr[yellow]/%S"
@@ -259,7 +288,7 @@ function setprompt()
 
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
-$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B\$pr[pwd]%b$pr[lineColor]├─\$pr[fillBar]\$vcs_info_msg_0_$pr[lineColor]──$pr[rightCorner]
+\$pr[infoLine]
 │\$pr[userOrTime] $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT="$pr[lineColor]│$pr[reset]"
@@ -267,6 +296,11 @@ $pr[lineColor]$pr[leftCorner]──┤$pr[white]%B\$pr[pwd]%b$pr[lineColor]├�
     PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT2=$RPROMPT
+
+    # Set a placeholder info line until the first async subshell completes
+    integer fillerLength
+    (( fillerLength = $COLUMNS - 8 ))
+    pr[infoLine]="$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B…%b$pr[lineColor]├${(e):-${(l.$fillerLength..─.)}}$pr[rightCorner]"
 }
 
 setprompt
