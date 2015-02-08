@@ -226,6 +226,48 @@ function precmd()
     fi
 }
 
+
+function toggleUnicode()
+{
+    if [[ $pr[unicode] -ne 0 ]]; then
+        pr[unicode]=0
+
+        pr[leftCorner]='┌'
+        pr[rightCorner]='┐'
+        pr[promptSymbol]='>'
+        pr[modifiedSymbol]='±'
+        pr[stagedSymbol]='±'
+        pr[timeSymbol]='Runtime:'
+        pr[returnSymbol]='Returned:'
+        pr[aheadSymbol]='>'
+        pr[behindSymbol]='<'
+        pr[stashSymbol]='$'
+        pr[conflictSymbol]='!'
+        pr[elideSymbol]='_'
+    else
+        pr[unicode]=1
+
+        pr[leftCorner]='╭'
+        pr[rightCorner]='╮'
+        pr[promptSymbol]='❱'
+        pr[modifiedSymbol]='±'
+        pr[stagedSymbol]='∓'
+        pr[timeSymbol]='⌛'
+        pr[returnSymbol]='↳'
+        pr[aheadSymbol]='↥'
+        pr[behindSymbol]='↧'
+        pr[stashSymbol]='↶'
+        pr[conflictSymbol]='✖'
+        pr[elideSymbol]='…'
+    fi
+
+    precmd
+}
+
+zle -N toggleUnicode
+bindkey '^u' toggleUnicode
+
+
 function setprompt()
 {
     setopt PROMPT_SUBST
@@ -239,36 +281,6 @@ function setprompt()
         pr[$color]="%{$fg[$color]%}"
     done
     pr[lineColor]=$pr[blue]
-
-    # Assume that xterms and 256 color terminals support Unicode.
-    # Not realistic, but good enough for the machines I use.
-    if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
-        pr[leftCorner]='╭'
-        pr[rightCorner]='╮'
-        pr[promptSymbol]='❱'
-        pr[modifiedSymbol]='±'
-        pr[stagedSymbol]='∓'
-        pr[timeSymbol]='⌛'
-        pr[returnSymbol]='↳'
-        pr[aheadSymbol]='↥'
-        pr[behindSymbol]='↧'
-        pr[stashSymbol]='↶'
-        pr[conflictSymbol]='✖'
-        pr[elideSymbol]='…'
-    else
-        pr[leftCorner]='┌'
-        pr[rightCorner]='┐'
-        pr[promptSymbol]='>'
-        pr[modifiedSymbol]='±'
-        pr[stagedSymbol]='±'
-        pr[timeSymbol]='Runtime:'
-        pr[returnSymbol]='Returned:'
-        pr[aheadSymbol]='>'
-        pr[behindSymbol]='<'
-        pr[stashSymbol]='$'
-        pr[conflictSymbol]='!'
-        pr[elideSymbol]='_'
-    fi
 
     # The temporary file where the first line of the prompt will be stored
     pr[tempFile]="$ZSH/prompt-info.tmp"
@@ -288,14 +300,21 @@ function setprompt()
     zstyle ':vcs_info:*' formats       "┤$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
     zstyle ':vcs_info:*' nvcsformats   "" "%d"
 
+    # Assume that xterms and 256 color terminals support Unicode.
+    # Not realistic, but good enough for the machines I use.
+    if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
+        pr[unicode]=0
+    fi
+    toggleUnicode
+
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
 \$pr[infoLine]
-│\$pr[userOrTime] $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
+│\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT="$pr[lineColor]│$pr[reset]"
 
-    PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B$pr[promptSymbol]%b$pr[reset] "
+    PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT2=$RPROMPT
 
