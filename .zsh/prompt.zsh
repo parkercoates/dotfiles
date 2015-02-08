@@ -162,6 +162,14 @@ function git-ahead-behind()
     fi
 }
 
+
+function TRAPWINCH()
+{
+    precmd
+    zle && zle reset-prompt
+}
+
+
 function precmd()
 {
     integer cmdSeconds
