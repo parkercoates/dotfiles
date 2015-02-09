@@ -212,6 +212,7 @@ function precmd()
     asyncPromptInfo &!
     pr[asyncPid]=$!
 
+    pr[infoLine]="$pr[lineColor]$(expandStrip "$pr[infoLine]")"
 
     integer cmdSeconds
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
