@@ -15,6 +15,7 @@ function expandStripLength()
     echo ${#stripped}
 }
 
+
 function compressPath()
 {
     integer newLength;
@@ -26,6 +27,9 @@ function compressPath()
 
     # Replace $HOME by ~.
     local newPath="${1/$HOME/~}"
+
+    # Remove trailing . that vcs_info adds when in the root of a repository.
+    newPath="${newPath/%\/\.//}"
 
     integer charsToRemove=0
     (( charsToRemove = $(expandStripLength $newPath) - $newLength ))
@@ -191,7 +195,7 @@ function precmd()
 
         integer maxPathLength
         (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
-        pr[pwd]=$(compressPath "${vcs_info_msg_1_%%.}" $maxPathLength)
+        pr[pwd]=$(compressPath "${vcs_info_msg_1_}" $maxPathLength)
 
         integer fillerLength
         (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
