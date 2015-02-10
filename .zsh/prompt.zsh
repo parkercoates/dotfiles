@@ -195,7 +195,7 @@ function precmd()
 
         integer maxPathLength
         (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
-        pr[pwd]=$(compressPath "${vcs_info_msg_1_}" $maxPathLength)
+        pr[pwd]=$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)
 
         integer fillerLength
         (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
@@ -306,7 +306,7 @@ function setprompt()
     zstyle ':vcs_info:svn*' branchformat  "%b$pr[yellow]@%r"
     zstyle ':vcs_info:*' actionformats "┤$pr[cyan]%B%a%%b$pr[lineColor]│$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
     zstyle ':vcs_info:*' formats       "┤$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
-    zstyle ':vcs_info:*' nvcsformats   "" "%d"
+    zstyle ':vcs_info:*' nvcsformats   "" ""
 
     # Assume that xterms and 256 color terminals support Unicode.
     # Not realistic, but good enough for the machines I use.
