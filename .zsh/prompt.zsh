@@ -299,6 +299,13 @@ function setprompt()
     # The temporary file where the first line of the prompt will be stored
     pr[tempFile]="$ZSH/prompt-info.tmp"
 
+    # Assume that xterms and 256 color terminals support Unicode.
+    # Not realistic, but good enough for the machines I use.
+    if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
+        pr[unicode]=0
+    fi
+    toggleUnicode
+
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
     local vcsPathFormat="%R$pr[yellow]/%S"
@@ -314,12 +321,6 @@ function setprompt()
     zstyle ':vcs_info:*' formats       "┤$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
     zstyle ':vcs_info:*' nvcsformats   "" ""
 
-    # Assume that xterms and 256 color terminals support Unicode.
-    # Not realistic, but good enough for the machines I use.
-    if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
-        pr[unicode]=0
-    fi
-    toggleUnicode
 
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
