@@ -243,24 +243,16 @@ function precmd()
 
 function toggleUnicode()
 {
-    if [[ $pr[unicode] -ne 0 ]]; then
-        pr[unicode]=0
-
-        pr[leftCorner]='┌'
-        pr[rightCorner]='┐'
-        pr[promptSymbol]='>'
-        pr[modifiedSymbol]='±'
-        pr[stagedSymbol]='±'
-        pr[timeSymbol]='Runtime:'
-        pr[returnSymbol]='Returned:'
-        pr[aheadSymbol]='^'
-        pr[behindSymbol]='v'
-        pr[stashSymbol]='@'
-        pr[conflictSymbol]='!'
-        pr[elideSymbol]='_'
+    if [[ -n "$1" ]]; then
+        pr[charset]="$1"
+    elif [[ $pr[charset] -eq 0 ]]; then
+        pr[charset]=1
     else
-        pr[unicode]=1
+        pr[charset]=0
+    fi
 
+    if [[ $pr[charset] -eq 0 ]]; then
+        # Full Unicode
         pr[leftCorner]='╭'
         pr[rightCorner]='╮'
         pr[promptSymbol]='❱'
@@ -273,13 +265,31 @@ function toggleUnicode()
         pr[stashSymbol]='↶'
         pr[conflictSymbol]='✖'
         pr[elideSymbol]='…'
+    else
+        # Code Page 437 only
+        pr[leftCorner]='┌'
+        pr[rightCorner]='┐'
+        pr[promptSymbol]='>'
+        pr[modifiedSymbol]='±'
+        pr[stagedSymbol]='±'
+        pr[timeSymbol]=''
+        pr[returnSymbol]='→'
+        pr[aheadSymbol]='↑'
+        pr[behindSymbol]='↓'
+        pr[stashSymbol]='←'
+        pr[conflictSymbol]='!'
+        pr[elideSymbol]='»'
     fi
+}
 
+function toggleUnicodeAndUpdate()
+{
+    toggleUnicode
     updatePromptInfo
 }
 
-zle -N toggleUnicode
-bindkey '^u' toggleUnicode
+zle -N toggleUnicodeAndUpdate
+bindkey '^u' toggleUnicodeAndUpdate
 
 
 function setprompt()
@@ -302,9 +312,10 @@ function setprompt()
     # Assume that xterms and 256 color terminals support Unicode.
     # Not realistic, but good enough for the machines I use.
     if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
-        pr[unicode]=0
+        toggleUnicode 0
+    else
+        toggleUnicode 1
     fi
-    toggleUnicode
 
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
