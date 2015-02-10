@@ -352,3 +352,13 @@ function setprompt()
 
 setprompt
 unfunction setprompt
+
+
+# Update the prompt every minute on the minute.
+zmodload zsh/datetime
+TMOUT=$(( 60 - ($EPOCHSECONDS % 60) ))
+function TRAPALRM()
+{
+    TMOUT=$(( 60 - ($EPOCHSECONDS % 60) ))
+    updatePromptInfo
+}
