@@ -165,8 +165,11 @@ function git-ahead-behind()
 
 function TRAPWINCH()
 {
-    precmd
-    zle && zle reset-prompt
+    # Regenerating the prompt in TRAPWINCH causes lines of history to be
+    # eaten. I still haven't figured out a workaround.
+
+#     precmd
+#     zle && zle reset-prompt
 }
 
 
