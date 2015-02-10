@@ -172,21 +172,12 @@ function TRAPWINCH()
     # Regenerating the prompt in TRAPWINCH causes lines of history to be
     # eaten. I still haven't figured out a workaround.
 
-#     precmd
+#     updatePromptInfo
 #     zle && zle reset-prompt
 }
 
 
-function TRAPUSR1()
-{
-    pr[infoLine]="$(< $pr[tempFile])"
-    pr[asyncPid]=0
-    zle && zle reset-prompt
-    rm "$pr[tempFile]"
-}
-
-
-function precmd()
+function updatePromptInfo()
 {
     function asyncPromptInfo()
     {
@@ -215,6 +206,21 @@ function precmd()
     # Launch subshell asynchronously and capture PID
     asyncPromptInfo &!
     pr[asyncPid]=$!
+}
+
+
+function TRAPUSR1()
+{
+    pr[infoLine]="$(< $pr[tempFile])"
+    pr[asyncPid]=0
+    zle && zle reset-prompt
+    rm "$pr[tempFile]"
+}
+
+
+function precmd()
+{
+    updatePromptInfo
 
     pr[infoLine]="$pr[lineColor]$(expandStrip "$pr[infoLine]")"
 
@@ -269,7 +275,7 @@ function toggleUnicode()
         pr[elideSymbol]='…'
     fi
 
-    precmd
+    updatePromptInfo
 }
 
 zle -N toggleUnicode
