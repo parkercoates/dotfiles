@@ -31,8 +31,7 @@ function compressPath()
     # Remove trailing . that vcs_info adds when in the root of a repository.
     newPath="${newPath/%\/\.//}"
 
-    integer charsToRemove=0
-    (( charsToRemove = $(expandStripLength $newPath) - $newLength ))
+    integer charsToRemove=$(( $(expandStripLength $newPath) - $newLength ))
 
     if (( $charsToRemove > 0 )); then
 
@@ -56,8 +55,7 @@ function compressPath()
             local dot=${stripped%%$compressible}
 
             if (( ${#compressible} > 1 )); then
-                integer charsToKeep
-                (( charsToKeep = ${#compressible} - $charsToRemove - 1 ))
+                integer charsToKeep=$(( ${#compressible} - $charsToRemove - 1 ))
                 if (( $charsToKeep < 1 )); then
                     charsToKeep=1
                 fi
@@ -184,12 +182,10 @@ function updatePromptInfo()
         # Update VSC data
         vcs_info
 
-        integer maxPathLength
-        (( maxPathLength = $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
+        integer maxPathLength=$(( $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
         pr[pwd]=$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)
 
-        integer fillerLength
-        (( fillerLength = $maxPathLength - $(expandStripLength "$pr[pwd]") ))
+        integer fillerLength=$(( $maxPathLength - $(expandStripLength "$pr[pwd]") ))
         pr[fillBar]="${(e):-${(l.$fillerLength..─.)}}"
 
         echo "$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$pr[pwd]%b$pr[lineColor]├─$pr[fillBar]$vcs_info_msg_0_──$pr[rightCorner]" >! "$pr[tempFile]"
