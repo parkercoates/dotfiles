@@ -165,16 +165,6 @@ function git-ahead-behind()
 }
 
 
-function TRAPWINCH()
-{
-    # Regenerating the prompt in TRAPWINCH causes lines of history to be
-    # eaten. I still haven't figured out a workaround.
-
-#     updatePromptInfo
-#     zle && zle reset-prompt
-}
-
-
 function updatePromptInfo()
 {
     function asyncPromptInfo()
@@ -358,3 +348,14 @@ function TRAPALRM()
     TMOUT=$(( 60 - ($EPOCHSECONDS % 60) ))
     updatePromptInfo
 }
+
+
+# Update the prompt when the console size changes.
+#
+# Note that this still eats scrollback when making the window narrower via
+# dragging, but I've decided I can live with that because I only ever resize
+# consoles in descrete steps. (Maximize, half-screen, split, etc.)
+function TRAPWINCH()
+{
+    updatePromptInfo
+ }
