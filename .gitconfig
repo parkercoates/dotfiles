@@ -42,7 +42,7 @@
 [diff]
 	mnemonicprefix = true
 	renames = copies
-	tool = kompare
+	tool = kdiff3
 
 [fetch]
 	prune = true
