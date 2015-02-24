@@ -1,0 +1,7 @@
+set commit-order = date
+set line-graphics = utf-8
+set refresh-mode = auto
+set tab-size = 4
+
+set main-view = date:relative author:email-user commit-title:graph:yes,refs:yes
+
