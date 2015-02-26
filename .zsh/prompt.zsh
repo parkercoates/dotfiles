@@ -173,12 +173,12 @@ function updatePromptInfo()
         vcs_info
 
         integer maxPathLength=$(( $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
-        pr[pwd]=$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)
+        local compressedPath=$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)
 
-        integer fillerLength=$(( $maxPathLength - $(expandStripLength "$pr[pwd]") ))
-        pr[fillBar]="${(e):-${(l.$fillerLength..─.)}}"
+        integer fillerLength=$(( $maxPathLength - $(expandStripLength "$compressedPath") ))
+        local fillBar="${(l.$fillerLength..─.)}"
 
-        echo "$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$pr[pwd]%b$pr[lineColor]├─$pr[fillBar]$vcs_info_msg_0_──$pr[rightCorner]" >! "$pr[tempFile]"
+        echo "$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$compressedPath%b$pr[lineColor]├─$fillBar$vcs_info_msg_0_──$pr[rightCorner]" >! "$pr[tempFile]"
 
         # Signal parent
         kill -s USR1 $$
