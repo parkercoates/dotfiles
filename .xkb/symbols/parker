@@ -1,0 +1,39 @@
+partial alphanumeric_keys
+xkb_symbols "altgr-intl" {
+
+    name[Group1]= "English (Parker's international)";
+
+    include "us(altgr-intl)"
+
+// Happy and sad faces
+    key <AC04> { [ f, F, U263A, U2639 ] };
+
+// R makes more sense to me for registed trademarks
+    key <AD04> { [ r, R, registered, trademark ] };
+
+// Infinity
+    key <AD08> { [ i, I, U221E, U222B ] };
+
+// Plus minus and minus plus
+    key <AD10> { [ p, P, U00B1, U2213 ] };
+
+// Arrows from cursor keys
+    key <LEFT> { [ Left,  Left,  U2190, U2196 ] };
+    key <UP>   { [ Up,    Up,    U2191, U2197 ] };
+    key <RGHT> { [ Right, Right, U2192, U2198 ] };
+    key <DOWN> { [ Down,  Down,  U2193, U2199 ] };
+
+// Bullets
+    key <AB05> { [ b, B, U2022, U25E6 ] };
+
+// Ellipsis
+    key <AB09>  { [ period, greater, U2026, dead_abovedot ] };
+
+// Interrobang
+    key <AB10> { [ slash, question, questiondown, U203D ] };
+
+// Four horizontal lines on a single key!
+    key <AE11> { [ minus, underscore, endash, emdash ] };
+    key <AD06> { [ y,     Y,          yen,    Udiaeresis ] };
+
+};

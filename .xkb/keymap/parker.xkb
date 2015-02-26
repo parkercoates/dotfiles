@@ -1,0 +1,21 @@
+xkb_keymap {
+    xkb_keycodes {
+        include "evdev+aliases(qwerty)"
+    };
+
+    xkb_types {
+        include "complete"
+    };
+
+    xkb_compatibility {
+        include "complete"
+    };
+
+    xkb_symbols {
+        include "pc+parker(altgr-intl)+inet(evdev)+capslock(swapescape)"
+    };
+
+    xkb_geometry {
+        include "pc(pc104)"
+    };
+};
