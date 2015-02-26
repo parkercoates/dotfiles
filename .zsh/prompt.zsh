@@ -293,7 +293,7 @@ function setprompt()
     pr[lineColor]=$pr[blue]
 
     # The temporary file where the first line of the prompt will be stored
-    pr[tempFile]="$ZSH/prompt-info.tmp"
+    pr[tempFile]="$ZSH/prompt-info.$$.tmp"
 
     # Assume that xterms and 256 color terminals support Unicode.
     # Not realistic, but good enough for the machines I use.
