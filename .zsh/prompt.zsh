@@ -173,12 +173,12 @@ function updatePromptInfo()
         vcs_info
 
         integer maxPathLength=$(( $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
-        local compressedPath=$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)
+        local compressedPath="$pr[white]%B$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)%b"
 
         integer fillerLength=$(( $maxPathLength - $(expandStripLength "$compressedPath") ))
         local fillBar="${(l.$fillerLength..─.)}"
 
-        echo "$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$compressedPath%b$pr[lineColor]├─$fillBar$vcs_info_msg_0_──$pr[rightCorner]" >! "$pr[tempFile]"
+        echo -e "$compressedPath\n$fillBar\n$vcs_info_msg_0_" >! "$pr[tempFile]"
 
         # Signal parent
         kill -s USR1 $$
@@ -197,8 +197,21 @@ function updatePromptInfo()
 
 function TRAPUSR1()
 {
-    pr[infoLine]="$(< $pr[tempFile])"
+    integer fd
+    exec {fd}< "$pr[tempFile]"
+
+    local line
+    read <&$fd line
+    pr[pwd]="$line"
+    read <&$fd line
+    pr[fillBar]="$line"
+    read <&$fd line
+    pr[vcsInfo]="$line"
+
+    exec {fd}<& -
+
     pr[asyncPid]=0
+    pr[waitIndicator]=''
     zle && zle reset-prompt
     rm "$pr[tempFile]"
 }
@@ -208,7 +221,11 @@ function precmd()
 {
     updatePromptInfo
 
-    pr[infoLine]="$pr[lineColor]$(expandStrip "$pr[infoLine]")"
+    # Show an indicator while waiting for the prompt to update.
+    if (( ${#pr[fillBar]} >= 2 )); then
+        pr[waitIndicator]="$pr[yellow]$pr[timeSymbol]$pr[lineColor]│"
+        pr[fillBar]=${pr[fillBar]:2}
+    fi
 
     integer cmdSeconds
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
@@ -321,7 +338,7 @@ function setprompt()
 
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
-\$pr[infoLine]
+$pr[lineColor]$pr[leftCorner]──┤\$pr[waitIndicator]\$pr[pwd]$pr[lineColor]├─\$pr[fillBar]\$pr[vcsInfo]──$pr[rightCorner]
 │\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT="$pr[lineColor]│$pr[reset]"
@@ -331,9 +348,10 @@ function setprompt()
     RPROMPT2=$RPROMPT
 
     # Set a placeholder info line until the first async subshell completes
-    integer fillerLength
-    (( fillerLength = $COLUMNS - 8 ))
-    pr[infoLine]="$pr[lineColor]$pr[leftCorner]──┤$pr[white]%B$pr[elideSymbol]%b$pr[lineColor]├${(e):-${(l.$fillerLength..─.)}}$pr[rightCorner]"
+    pr[pwd]="$pr[white]$pr[elideSymbol]"
+    integer fillerLength=$(( $COLUMNS - 11 ))
+    pr[fillBar]=${(l.$fillerLength..─.)}
+    pr[vcsInfo]=''
 }
 
 setprompt
@@ -358,4 +376,4 @@ function TRAPALRM()
 function TRAPWINCH()
 {
     updatePromptInfo
- }
+}
