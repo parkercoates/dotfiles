@@ -40,6 +40,7 @@
 	helper = cache --timeout=10800
 
 [diff]
+	algorithm = patience
 	mnemonicprefix = true
 	renames = copies
 	tool = kdiff3
