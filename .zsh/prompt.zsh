@@ -241,19 +241,9 @@ function precmd()
 }
 
 
-function toggleUnicode()
+function switchCharSet()
 {
-    if [[ -n "$1" ]]; then
-        pr[charset]="$1"
-    elif [[ $pr[charset] -eq 0 ]]; then
-        pr[charset]=1
-    elif [[ $pr[charset] -eq 1 ]]; then
-        pr[charset]=2
-    else
-        pr[charset]=0
-    fi
-
-    if [[ $pr[charset] -eq 0 ]]; then
+    if [[ "$1" -eq 0 ]]; then
         # Full Unicode
         pr[promptSymbol]='❱'
         pr[modifiedSymbol]='±'
@@ -274,7 +264,7 @@ function toggleUnicode()
         pr[leftCap]='┤'
         pr[rightCap]='├'
 
-    elif [[ $pr[charset] -eq 1 ]]; then
+    elif [[ "$1" -eq 1 ]]; then
         # Code Page 437 only
         pr[promptSymbol]='>'
         pr[modifiedSymbol]='±'
@@ -317,14 +307,22 @@ function toggleUnicode()
     fi
 }
 
-function toggleUnicodeAndUpdate()
+function cycleCharSetAndUpdate()
 {
-    toggleUnicode
+    if [[ $pr[charset] -eq 0 ]]; then
+        pr[charset]=1
+    elif [[ $pr[charset] -eq 1 ]]; then
+        pr[charset]=2
+    else
+        pr[charset]=0
+    fi
+
+    switchCharSet $pr[charset]
     updatePromptInfo
 }
 
-zle -N toggleUnicodeAndUpdate
-bindkey '^u' toggleUnicodeAndUpdate
+zle -N cycleCharSetAndUpdate
+bindkey '^u' cycleCharSetAndUpdate
 
 
 function setprompt()
@@ -347,10 +345,11 @@ function setprompt()
     # Assume that xterms and 256 color terminals support Unicode.
     # Not realistic, but good enough for the machines I use.
     if [[ "$TERM" == xterm* || "$TERM" == *256* ]]; then
-        toggleUnicode 0
+        pr[charset]=0
     else
-        toggleUnicode 1
+        pr[charset]=1
     fi
+    switchCharSet $pr[charset]
 
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
