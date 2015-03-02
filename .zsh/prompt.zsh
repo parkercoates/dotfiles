@@ -215,7 +215,7 @@ function precmd()
     updatePromptInfo
 
     # Show an indicator while waiting for the prompt to update.
-    pr[waitIndicator]="┤$pr[yellow]$pr[timeSymbol]$pr[lineColor]├"
+    pr[waitIndicator]="┤$pr[yellow]$pr[waitSymbol]$pr[lineColor]├"
 
     # Show the current path without formatting while waiting.
     integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$pr[waitIndicator]$pr[vcsInfo]──╮_") ))
@@ -229,7 +229,7 @@ function precmd()
     pr[lastCmdStart]=""
     pr[cmdRunTime]=""
     if (( $cmdSeconds > 7 && $TTYIDLE > 7 )); then
-        pr[cmdRunTime]="$pr[timeSymbol] $(elapsedTimeFormat $cmdSeconds)
+        pr[cmdRunTime]="$pr[runtimeSymbol] $(elapsedTimeFormat $cmdSeconds)
 "
     fi
 
@@ -258,13 +258,14 @@ function toggleUnicode()
         pr[promptSymbol]='❱'
         pr[modifiedSymbol]='±'
         pr[stagedSymbol]='∓'
-        pr[timeSymbol]='⌛'
+        pr[runtimeSymbol]='⌛'
         pr[returnSymbol]='↳'
         pr[aheadSymbol]='↥'
         pr[behindSymbol]='↧'
         pr[stashSymbol]='↶'
         pr[conflictSymbol]='✖'
         pr[elideSymbol]='…'
+        pr[waitSymbol]='⌛'
     else
         # Code Page 437 only
         pr[leftCorner]='┌'
@@ -272,13 +273,14 @@ function toggleUnicode()
         pr[promptSymbol]='>'
         pr[modifiedSymbol]='±'
         pr[stagedSymbol]='±'
-        pr[timeSymbol]=''
+        pr[runtimeSymbol]=''
         pr[returnSymbol]='→'
         pr[aheadSymbol]='↑'
         pr[behindSymbol]='↓'
         pr[stashSymbol]='←'
         pr[conflictSymbol]='!'
         pr[elideSymbol]='»'
+        pr[waitSymbol]='≈'
     fi
 }
 
