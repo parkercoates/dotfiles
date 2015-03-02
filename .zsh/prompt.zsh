@@ -345,12 +345,6 @@ $pr[lineColor]\$pr[leftCorner]──┤\$pr[pwd]$pr[lineColor]├─\$pr[fillBar
     PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT2=$RPROMPT
-
-    # Set a placeholder info line until the first async subshell completes
-    pr[pwd]="$pr[white]$pr[elideSymbol]"
-    integer fillerLength=$(( $COLUMNS - 11 ))
-    pr[fillBar]=${(l.$fillerLength..─.)}
-    pr[vcsInfo]=''
 }
 
 setprompt
