@@ -122,7 +122,7 @@ function +vi-git-misc()
     # Add conflicted file count.
     local conflictCount=$(git ls-files --unmerged 2>/dev/null | cut -f2 | uniq | wc -l)
     if (( $conflictCount > 0 )); then
-        hook_com[misc]+="$pr[lineColor]│$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
+        hook_com[misc]+="$pr[lineColor]$pr[vertLine]$pr[red]%B$conflictCount$pr[conflictSymbol]%b"
     fi
 
     # Add upstream ahead and behind counts.
@@ -134,7 +134,7 @@ function +vi-git-misc()
         if (( $stashCount == 1 )); then
             stashCount=''
         fi
-        hook_com[misc]+="$pr[lineColor]│$pr[magenta]$stashCount$pr[stashSymbol]"
+        hook_com[misc]+="$pr[lineColor]$pr[vertLine]$pr[magenta]$stashCount$pr[stashSymbol]"
     fi
 }
 
@@ -154,11 +154,11 @@ function git-ahead-behind()
         integer behind=$(git rev-list HEAD..$remote 2>/dev/null | wc -l)
 
         if (( $ahead > 0 )); then
-            echo -n "$pr[lineColor]│$pr[yellow]$ahead$pr[aheadSymbol]"
+            echo -n "$pr[lineColor]$pr[vertLine]$pr[yellow]$ahead$pr[aheadSymbol]"
         fi
 
         if (( $behind > 0 )); then
-            echo -n "$pr[lineColor]│$pr[yellow]$behind$pr[behindSymbol]"
+            echo -n "$pr[lineColor]$pr[vertLine]$pr[yellow]$behind$pr[behindSymbol]"
         fi
     fi
 }
@@ -175,7 +175,7 @@ function updatePromptInfo()
         local compressedPath="$pr[white]%B$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)%b"
 
         integer fillerLength=$(( $maxPathLength - $(escapelessLength "$compressedPath") ))
-        local fillBar="${(l.$fillerLength..─.)}"
+        local fillBar="\${(l.$fillerLength..$pr[horzLine].)}"
 
         echo -e "$compressedPath\n$fillBar\n$vcs_info_msg_0_" >! "$pr[tempFile]"
 
@@ -215,14 +215,14 @@ function precmd()
     updatePromptInfo
 
     # Show an indicator while waiting for the prompt to update.
-    pr[waitIndicator]="┤$pr[yellow]$pr[waitSymbol]$pr[lineColor]├"
+    pr[waitIndicator]="$pr[leftCap]$pr[yellow]$pr[waitSymbol]$pr[lineColor]$pr[rightCap]"
 
     # Show the current path without formatting while waiting.
     integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$pr[waitIndicator]$pr[vcsInfo]──╮_") ))
     pr[pwd]="$pr[reset]$(compressPath "$PWD" $maxPathLength)"
 
     integer fillerLength=$(( $maxPathLength - $(escapelessLength "$pr[pwd]") ))
-    pr[fillBar]="${(l.$fillerLength..─.)}"
+    pr[fillBar]="\${(l.$fillerLength..$pr[horzLine].)}"
 
     integer cmdSeconds
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
@@ -247,14 +247,14 @@ function toggleUnicode()
         pr[charset]="$1"
     elif [[ $pr[charset] -eq 0 ]]; then
         pr[charset]=1
+    elif [[ $pr[charset] -eq 1 ]]; then
+        pr[charset]=2
     else
         pr[charset]=0
     fi
 
     if [[ $pr[charset] -eq 0 ]]; then
         # Full Unicode
-        pr[leftCorner]='╭'
-        pr[rightCorner]='╮'
         pr[promptSymbol]='❱'
         pr[modifiedSymbol]='±'
         pr[stagedSymbol]='∓'
@@ -266,10 +266,16 @@ function toggleUnicode()
         pr[conflictSymbol]='✖'
         pr[elideSymbol]='…'
         pr[waitSymbol]='⌛'
-    else
+
+        pr[leftCorner]='╭'
+        pr[rightCorner]='╮'
+        pr[vertLine]='│'
+        pr[horzLine]='─'
+        pr[leftCap]='┤'
+        pr[rightCap]='├'
+
+    elif [[ $pr[charset] -eq 1 ]]; then
         # Code Page 437 only
-        pr[leftCorner]='┌'
-        pr[rightCorner]='┐'
         pr[promptSymbol]='>'
         pr[modifiedSymbol]='±'
         pr[stagedSymbol]='±'
@@ -281,6 +287,33 @@ function toggleUnicode()
         pr[conflictSymbol]='!'
         pr[elideSymbol]='»'
         pr[waitSymbol]='≈'
+
+        pr[leftCorner]='┌'
+        pr[rightCorner]='┐'
+        pr[vertLine]='│'
+        pr[horzLine]='─'
+        pr[leftCap]='┤'
+        pr[rightCap]='├'
+    else
+        # ASCII only
+        pr[promptSymbol]='>'
+        pr[modifiedSymbol]='*'
+        pr[stagedSymbol]='*'
+        pr[runtimeSymbol]=''
+        pr[returnSymbol]='\'
+        pr[aheadSymbol]='A'
+        pr[behindSymbol]='B'
+        pr[stashSymbol]='#'
+        pr[conflictSymbol]='!'
+        pr[elideSymbol]='_'
+        pr[waitSymbol]='%%'
+
+        pr[leftCorner]='|'
+        pr[rightCorner]='|'
+        pr[vertLine]='|'
+        pr[horzLine]='='
+        pr[leftCap]='['
+        pr[rightCap]=']'
     fi
 }
 
@@ -327,22 +360,22 @@ function setprompt()
     zstyle ':vcs_info:*' check-for-changes true
     zstyle ':vcs_info:git+set-message:*' hooks git-misc
     zstyle ':vcs_info:git-svn+set-message:*' hooks git-svn-ahead-behind git-stash
-    zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B$pr[modifiedSymbol]%b"
-    zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B$pr[stagedSymbol]%b"
+    zstyle ':vcs_info:*' unstagedstr   "$pr[red]%B\$pr[modifiedSymbol]%b"
+    zstyle ':vcs_info:*' stagedstr     "$pr[yellow]%B\$pr[stagedSymbol]%b"
     zstyle ':vcs_info:svn*' branchformat  "%b$pr[yellow]@%r"
-    zstyle ':vcs_info:*' actionformats "┤$pr[cyan]%B%a%%b$pr[lineColor]│$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
-    zstyle ':vcs_info:*' formats       "┤$vcsBranchFormat$pr[lineColor]├" "$vcsPathFormat"
+    zstyle ':vcs_info:*' actionformats "\$pr[leftCap]$pr[cyan]%B%a%%b$pr[lineColor]\$pr[vertLine]$vcsBranchFormat$pr[lineColor]\$pr[rightCap]" "$vcsPathFormat"
+    zstyle ':vcs_info:*' formats       "\$pr[leftCap]$vcsBranchFormat$pr[lineColor]\$pr[rightCap]" "$vcsPathFormat"
     zstyle ':vcs_info:*' nvcsformats   "" ""
 
 
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
-$pr[lineColor]\$pr[leftCorner]──┤\$pr[pwd]$pr[lineColor]├─\$pr[fillBar]\$pr[waitIndicator]\$pr[vcsInfo]──\$pr[rightCorner]
-│\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
+$pr[lineColor]\$pr[leftCorner]\$pr[horzLine]\$pr[horzLine]\$pr[leftCap]\$pr[pwd]$pr[lineColor]\$pr[rightCap]\$pr[horzLine]\${(e)pr[fillBar]}\$pr[waitIndicator]\${(e)pr[vcsInfo]}\$pr[horzLine]\$pr[horzLine]\$pr[rightCorner]
+\$pr[vertLine]\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
-    RPROMPT="$pr[lineColor]│$pr[reset]"
+    RPROMPT="$pr[lineColor]\$pr[vertLine]$pr[reset]"
 
-    PROMPT2="$pr[lineColor]│$pr[green]%_ $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
+    PROMPT2="$pr[lineColor]\$pr[vertLine]$pr[green]%_ $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT2=$RPROMPT
 }
