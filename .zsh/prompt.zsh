@@ -199,15 +199,9 @@ function TRAPUSR1()
 {
     integer fd
     exec {fd}< "$pr[tempFile]"
-
-    local line
-    read <&$fd line
-    pr[pwd]="$line"
-    read <&$fd line
-    pr[fillBar]="$line"
-    read <&$fd line
-    pr[vcsInfo]="$line"
-
+    read <&$fd 'pr[pwd]'
+    read <&$fd 'pr[fillBar]'
+    read <&$fd 'pr[vcsInfo]'
     exec {fd}<& -
 
     pr[asyncPid]=0
