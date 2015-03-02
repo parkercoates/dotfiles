@@ -3,16 +3,15 @@ function preexec()
     pr[lastCmdStart]=$SECONDS
 }
 
-function expandStrip()
+function escapeless()
 {
-    local expanded="${(%):-$1}"
-    echo $expanded | perl -pe 's/\e\[?.*?[\@-~]//g'
+    local zero='%([BSUbfksu]|([FB]|){*})'
+    echo "${(S%%)1//$~zero/}"
 }
 
-function expandStripLength()
+function escapelessLength()
 {
-    local stripped="$(expandStrip $1)"
-    echo ${#stripped}
+    echo "${#:-$(escapeless $1)}"
 }
 
 
@@ -31,7 +30,7 @@ function compressPath()
     # Remove trailing . that vcs_info adds when in the root of a repository.
     newPath="${newPath/%\/\.//}"
 
-    integer charsToRemove=$(( $(expandStripLength $newPath) - $newLength ))
+    integer charsToRemove=$(( $(escapelessLength $newPath) - $newLength ))
 
     if (( $charsToRemove > 0 )); then
 
@@ -46,7 +45,7 @@ function compressPath()
 
             # If there are escape codes at the end of the segment, strip them off
             # and hold on to them so we can stick them back on later.
-            local stripped=$(expandStrip "$segments[$i]")
+            local stripped=$(escapeless "$segments[$i]")
             local escapes=${segments[$i]##$stripped}
 
             # If the segment starts with a dot, strip it off and hold on to it,
@@ -172,10 +171,10 @@ function updatePromptInfo()
         # Update VSC data
         vcs_info
 
-        integer maxPathLength=$(( $COLUMNS - $(expandStripLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
+        integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
         local compressedPath="$pr[white]%B$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)%b"
 
-        integer fillerLength=$(( $maxPathLength - $(expandStripLength "$compressedPath") ))
+        integer fillerLength=$(( $maxPathLength - $(escapelessLength "$compressedPath") ))
         local fillBar="${(l.$fillerLength..─.)}"
 
         echo -e "$compressedPath\n$fillBar\n$vcs_info_msg_0_" >! "$pr[tempFile]"
