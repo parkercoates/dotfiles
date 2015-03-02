@@ -215,10 +215,14 @@ function precmd()
     updatePromptInfo
 
     # Show an indicator while waiting for the prompt to update.
-    if (( ${#pr[fillBar]} >= 2 )); then
-        pr[waitIndicator]="$pr[yellow]$pr[timeSymbol]$pr[lineColor]│"
-        pr[fillBar]=${pr[fillBar]:2}
-    fi
+    pr[waitIndicator]="┤$pr[yellow]$pr[timeSymbol]$pr[lineColor]├"
+
+    # Show the current path without formatting while waiting.
+    integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$pr[waitIndicator]$pr[vcsInfo]──╮_") ))
+    pr[pwd]="$pr[reset]$(compressPath "$PWD" $maxPathLength)"
+
+    integer fillerLength=$(( $maxPathLength - $(escapelessLength "$pr[pwd]") ))
+    pr[fillBar]="${(l.$fillerLength..─.)}"
 
     integer cmdSeconds
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
@@ -331,7 +335,7 @@ function setprompt()
 
     PROMPT="       %(?..$pr[red]%B\$pr[returnSymbol] \$? %b)$pr[yellow]\${pr[cmdRunTime]:-%(?..
 )}
-$pr[lineColor]$pr[leftCorner]──┤\$pr[waitIndicator]\$pr[pwd]$pr[lineColor]├─\$pr[fillBar]\$pr[vcsInfo]──$pr[rightCorner]
+$pr[lineColor]\$pr[leftCorner]──┤\$pr[pwd]$pr[lineColor]├─\$pr[fillBar]\$pr[waitIndicator]\$pr[vcsInfo]──\$pr[rightCorner]
 │\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
     RPROMPT="$pr[lineColor]│$pr[reset]"
