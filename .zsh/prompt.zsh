@@ -228,7 +228,7 @@ function precmd()
     (( cmdSeconds = $SECONDS - ${pr[lastCmdStart]:=$SECONDS} ))
     pr[lastCmdStart]=""
     pr[cmdRunTime]=""
-    if (( $cmdSeconds > 7 && $TTYIDLE > 7 )); then
+    if (( $cmdSeconds >= $pr[minRuntimeForDisplay] && $TTYIDLE >= $pr[minRuntimeForDisplay] )); then
         pr[cmdRunTime]="$pr[runtimeSymbol] $(elapsedTimeFormat $cmdSeconds)
 "
     fi
@@ -350,6 +350,8 @@ function setprompt()
         pr[charset]=1
     fi
     switchCharSet $pr[charset]
+
+    pr[minRuntimeForDisplay]=5
 
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
