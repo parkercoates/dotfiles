@@ -5,6 +5,12 @@ xkb_symbols "altgr-intl" {
 
     include "us(altgr-intl)"
 
+
+    key <FK01> { [ F1, F1, U2669, U2660 ] };
+    key <FK02> { [ F2, F2, U266A, U2663 ] };
+    key <FK03> { [ F3, F3, U266B, U2665 ] };
+    key <FK04> { [ F4, F4, U266C, U2666 ] };
+
 // Happy and sad faces
     key <AC04> { [ f, F, U263A, U2639 ] };
 
