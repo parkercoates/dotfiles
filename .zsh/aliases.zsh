@@ -16,6 +16,8 @@ alias kd='kdevelop &>/dev/null&|'
 alias as='assistant &>/dev/null&|'
 alias ds='designer &>/dev/null&|'
 
+alias git-root='cd "$(git rev-parse --show-toplevel)"'
+
 # Make and change directory
 function mcd()
 {
