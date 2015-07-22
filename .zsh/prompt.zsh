@@ -193,6 +193,8 @@ function updatePromptInfo()
     pr[asyncPid]=$!
 }
 
+zle -N updatePromptInfo
+bindkey '^g' updatePromptInfo
 
 function TRAPUSR1()
 {
