@@ -15,7 +15,7 @@ Usage:
 
     git branch-push --force <remote-branch>
         Force pushes HEAD to the <remote-branch>. <remote-branch> must be
-        specified and must exist.
+        specified, must exist, and must be up to date with the remote.
 
     git branch-push --create <remote-branch>
         Creates <remote-branch> on the remote and pushes HEAD to it.
@@ -132,7 +132,7 @@ fi
 if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
 elif [ "$forceMode" = 'true' ]; then
-    git push --force $remote HEAD:$branch
+    git push --force-with-lease $remote HEAD:$branch
 else
     git push $remote HEAD:$branch
 fi
