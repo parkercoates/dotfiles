@@ -8,10 +8,8 @@ Usage:
         it defaults to the current branch's upstream. Either way, <remote
         -branch> must exist.
 
-    git branch-push --prompt [<remote-branch>]
-        The same as above, but after the list of changes to push is shown,
-        the user is prompted as to whether they wish to continue with the
-        push. Mostly useful for previewing unpushed work.
+    git branch-push --no-prompt [<remote-branch>]
+        The same as above, but the user is not prompted before pushing.
 
     git branch-push --force <remote-branch>
         Force pushes HEAD to the <remote-branch>. <remote-branch> must be
@@ -31,9 +29,10 @@ fail() {
     exit 1
 }
 
+promptMode='true'
 case "$1" in
---prompt)
-    promptMode='true'
+--no-prompt)
+    promptMode='false'
     shift;
     ;;
 --force)
