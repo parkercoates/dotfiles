@@ -171,13 +171,15 @@ function updatePromptInfo()
         # Update VSC data
         vcs_info
 
-        integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$vcs_info_msg_0_──╮_") ))
+        local vcsStatus="${vcs_info_msg_0_/.../$pr[elideSymbol]}"
+
+        integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$vcsStatus──╮_") ))
         local compressedPath="$pr[white]%B$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)%b"
 
         integer fillerLength=$(( $maxPathLength - $(escapelessLength "$compressedPath") ))
         local fillBar="\${(l.$fillerLength..$pr[horzLine].)}"
 
-        echo -e "$compressedPath\n$fillBar\n$vcs_info_msg_0_" >! "$pr[tempFile]"
+        echo -e "$compressedPath\n$fillBar\n$vcsStatus" >! "$pr[tempFile]"
 
         # Signal parent
         kill -s USR1 $$
