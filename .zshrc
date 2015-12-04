@@ -47,6 +47,8 @@ source $ZSH/keys.zsh
 source $ZSH/prompt.zsh
 pr[defaultUser]=coates@halfpounddonair
 
+source $ZSH/tab-on-empty-line-shows-files.zsh
+
 source $ZSH/tmux.zsh
 
 source $ZSH/history-substring-search/zsh-history-substring-search.zsh
