@@ -260,6 +260,7 @@ function switchCharSet()
         pr[conflictSymbol]='✖'
         pr[elideSymbol]='…'
         pr[waitSymbol]='⌛'
+        pr[nestedSymbol]='◲×'
 
         pr[leftCorner]='╭'
         pr[rightCorner]='╮'
@@ -281,6 +282,7 @@ function switchCharSet()
         pr[conflictSymbol]='!'
         pr[elideSymbol]='»'
         pr[waitSymbol]='≈'
+        pr[nestedSymbol]='≡'
 
         pr[leftCorner]='┌'
         pr[rightCorner]='┐'
@@ -301,6 +303,7 @@ function switchCharSet()
         pr[conflictSymbol]='!'
         pr[elideSymbol]='_'
         pr[waitSymbol]='%%'
+        pr[nestedSymbol]=''
 
         pr[leftCorner]='|'
         pr[rightCorner]='|'
@@ -357,6 +360,12 @@ function setprompt()
 
     pr[minRuntimeForDisplay]=5
 
+    export ZSH_DEPTH
+    if [[ $ZSH_DEPTH -gt 0 ]]; then
+        pr[depth]="$pr[yellow]\$pr[nestedSymbol]$ZSH_DEPTH$pr[reset]"
+    fi
+    ((ZSH_DEPTH+=1))
+
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
     local vcsPathFormat="%R$pr[yellow]/%S"
@@ -378,7 +387,7 @@ function setprompt()
 $pr[lineColor]\$pr[leftCorner]\$pr[horzLine]\$pr[horzLine]\$pr[leftCap]\$pr[pwd]$pr[lineColor]\$pr[rightCap]\$pr[horzLine]\${(e)pr[fillBar]}\$pr[waitIndicator]\${(e)pr[vcsInfo]}\$pr[horzLine]\$pr[horzLine]\$pr[rightCorner]
 \$pr[vertLine]\$pr[userOrTime] $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
-    RPROMPT="$pr[lineColor]\$pr[vertLine]$pr[reset]"
+    RPROMPT=" $pr[depth]$pr[lineColor]\$pr[vertLine]$pr[reset]"
 
     PROMPT2="$pr[lineColor]\$pr[vertLine]$pr[green]%_ $pr[yellow]%B\$pr[promptSymbol]%b$pr[reset] "
 
