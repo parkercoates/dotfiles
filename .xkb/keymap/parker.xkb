@@ -12,7 +12,7 @@ xkb_keymap {
     };
 
     xkb_symbols {
-        include "pc+parker(altgr-intl)+inet(evdev)+capslock(escape)+shift(both_capslock_cancel)"
+        include "pc+parker(altgr-intl)+inet(evdev)+capslock(escape)"
     };
 
     xkb_geometry {
