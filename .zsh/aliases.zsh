@@ -3,8 +3,8 @@
 alias -g "\&"="&>/dev/null&|"
 
 alias ls='ls --color=auto'
-alias ll='ls -l'
-alias la='ls -lA'
+alias ll='ls -lh'
+alias la='ls -lhA'
 
 alias grep='grep --color=auto --perl-regexp'
 
