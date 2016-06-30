@@ -12,6 +12,12 @@ xkb_symbols "altgr-intl" {
     key <FK03> { [ F3, F3, U266B, U2665 ] };
     key <FK04> { [ F4, F4, U266C, U2666 ] };
 
+// Empty set 
+    key <AE10> { [ 0, parenright, U2205, dead_abovering ] };
+
+// Dagger and double dagger
+    key <AC03> { [ d, D, U2020, U2021 ] };
+
 // Happy and sad faces
     key <AC04> { [ f, F, U263A, U2639 ] };
 
@@ -24,11 +30,20 @@ xkb_symbols "altgr-intl" {
 // Plus minus and minus plus
     key <AD10> { [ p, P, U00B1, U2213 ] };
 
+// Lambda on the backslash key
+    key <BKSL> { [ backslash, bar, U03BB, brokenbar ] };
+
 // Arrows from cursor keys
     key <LEFT> { [ Left,  Left,  U2190, U2196 ] };
     key <UP>   { [ Up,    Up,    U2191, U2197 ] };
     key <RGHT> { [ Right, Right, U2192, U2198 ] };
     key <DOWN> { [ Down,  Down,  U2193, U2199 ] };
+
+// Check boxes
+    key <AB02> { [ x, X, U2611, U2610 ] };
+
+// Unicode replacement character
+    key <AB04> { [ v, V, UFFFD, V ] };
 
 // Bullets
     key <AB05> { [ b, B, U2022, U25E6 ] };
