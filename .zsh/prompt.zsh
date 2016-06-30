@@ -27,9 +27,6 @@ function compressPath()
     # Replace $HOME by ~.
     local newPath="${1/$HOME/~}"
 
-    # Remove trailing . that vcs_info adds when in the root of a repository.
-    newPath="${newPath/%\/\.//}"
-
     integer charsToRemove=$(( $(escapelessLength $newPath) - $newLength ))
 
     if (( $charsToRemove > 0 )); then
@@ -172,9 +169,17 @@ function updatePromptInfo()
         vcs_info
 
         local vcsStatus="${vcs_info_msg_0_/.../$pr[elideSymbol]}"
+        local vcsSubdir="$vcs_info_msg_1_"
+
+        local dir="$PWD"
+        if [[ $dir == */$vcsSubdir ]]; then
+            dir="${dir%%/$vcsSubdir}$pr[yellow]/$vcsSubdir"
+        elif [[ -n "$vcsSubdir" ]]; then
+            dir="$dir$pr[yellow]/"
+        fi
 
         integer maxPathLength=$(( $COLUMNS - $(escapelessLength "╭──┤├─$vcsStatus──╮_") ))
-        local compressedPath="$pr[white]%B$(compressPath "${vcs_info_msg_1_:-$PWD}" $maxPathLength)%b"
+        local compressedPath="$pr[white]%B$(compressPath "$dir" $maxPathLength)%b"
 
         integer fillerLength=$(( $maxPathLength - $(escapelessLength "$compressedPath") ))
         local fillBar="\${(l.$fillerLength..$pr[horzLine].)}"
@@ -368,7 +373,7 @@ function setprompt()
 
     autoload -Uz vcs_info
     local vcsBranchFormat="%u%c$pr[green]%b%m"
-    local vcsPathFormat="%R$pr[yellow]/%S"
+    local vcsPathFormat="%S"
 
     zstyle ':vcs_info:*' enable git svn
     zstyle ':vcs_info:*' check-for-changes true
