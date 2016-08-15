@@ -112,7 +112,7 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
     echo
     echo
     echo 'Files changed:'
-    git --no-pager diff --stat $remoteHash..$headHash
+    git --no-pager diff --stat -M10% $remoteHash..$headHash
     echo
 fi
 
