@@ -13,20 +13,20 @@ function cdup()
     return $?
 
 
-    if [[ -z "$1" ]]; then
-        cd ..
-    else
-        local -a cdpathtemp
-        local -a segments
-        segments=(${(s:/:)$(pwd | sed --posix 's:[^/][^/]*:..:g')})
-        while (( ${#segments} > 0 )); do
-            cdpathtemp[1,0]=(${(j:/:)segments})
-            shift segments
-        done
-        echo "[$cdpathtemp] ${#cdpathtemp}"
-        cdpath=($cdpathtemp) cd $1
-    fi
-    return $?
+#     if [[ -z "$1" ]]; then
+#         cd ..
+#     else
+#         local -a cdpathtemp
+#         local -a segments
+#         segments=(${(s:/:)$(pwd | sed --posix 's:[^/][^/]*:..:g')})
+#         while (( ${#segments} > 0 )); do
+#             cdpathtemp[1,0]=(${(j:/:)segments})
+#             shift segments
+#         done
+#         echo "[$cdpathtemp] ${#cdpathtemp}"
+#         cdpath=($cdpathtemp) cd $1
+#     fi
+#     return $?
 
 
 #    local ancestor=".."
