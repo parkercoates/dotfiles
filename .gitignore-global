@@ -1,3 +1,6 @@
 *.kdev*
 *.kate-swp
 .~*
+*.autosave
+
+CMakeLists.txt.user
