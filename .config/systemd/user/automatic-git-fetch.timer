@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to update Git repositories
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target

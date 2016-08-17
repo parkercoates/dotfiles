@@ -1,0 +1,6 @@
+[Unit]
+Description=Update Git repositories
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /home/coates/bin/automatic-git-fetch.sh
