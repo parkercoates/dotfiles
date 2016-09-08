@@ -242,7 +242,7 @@ function precmd()
 "
     fi
 
-    if [[ "${(%):-%n@%m}" != "$pr[defaultUser]" ]] || [[ -n "$SSH_TTY" ]]; then
+    if [[ "$USER" != "$pr[defaultUser]" ]] || [[ -n "$SSH_TTY" ]]; then
         pr[userOrTime]="$pr[green]%n$pr[cyan]@%m"
     else
         pr[userOrTime]="$pr[green]%D{%H:%M}"

@@ -45,7 +45,7 @@ source $ZSH/history.zsh
 source $ZSH/keys.zsh
 
 source $ZSH/prompt.zsh
-pr[defaultUser]=coates@halfpounddonair
+pr[defaultUser]=coates
 
 source $ZSH/tab-on-empty-line-shows-files.zsh
 
