@@ -59,5 +59,10 @@ source $ZSH/history-substring-search/zsh-history-substring-search.zsh
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
+if type fzf >/dev/null 2>&1; then
+    source $ZSH/fzf.zsh
+fi
+
+
 # Sourcing this too early causes it to stop working. Not sure why.
 source $ZSH/edit-command-line.zsh
