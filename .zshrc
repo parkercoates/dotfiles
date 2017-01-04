@@ -38,7 +38,9 @@ source $ZSH/cdup.zsh
 
 source $ZSH/completion.zsh
 
-source $ZSH/fasd.zsh
+if type fasd >/dev/null 2>&1; then
+    source $ZSH/fasd.zsh
+fi
 
 source $ZSH/history.zsh
 
