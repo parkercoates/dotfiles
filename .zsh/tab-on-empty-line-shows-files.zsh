@@ -1,4 +1,4 @@
-# Based http://unix.stackexchange.com/a/32426/105025
+# Based on http://unix.stackexchange.com/a/32426/105025
 
 function list-files()
 {
@@ -26,7 +26,7 @@ function expand-or-complete-or-list-files()
     if [[ -z $BUFFER ]]; then
         zle list-files
     else
-        zle expand-or-complete
+        zle expand-multiple-dots-then-expand-or-complete
     fi
 }
 zle -N expand-or-complete-or-list-files

@@ -47,6 +47,8 @@ source $ZSH/keys.zsh
 source $ZSH/prompt.zsh
 pr[defaultUser]=coates
 
+source $ZSH/expand-multiple-dots.zsh
+
 source $ZSH/tab-on-empty-line-shows-files.zsh
 
 source $ZSH/tmux.zsh
