@@ -6,7 +6,7 @@ alias ls='ls --color=auto'
 alias ll='ls -lh'
 alias la='ls -lhA'
 
-alias grep='grep --color=auto --perl-regexp'
+alias grep='grep --color=auto'
 
 # Development conveniences
 alias sshudo='eval `ssh-agent`; ssh-add; '
