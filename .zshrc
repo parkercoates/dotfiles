@@ -55,7 +55,7 @@ source $ZSH/tab-on-empty-line-shows-files.zsh
 
 source $ZSH/tmux.zsh
 
-source $ZSH/history-substring-search/zsh-history-substring-search.zsh
+source $ZSH/zsh-history-substring-search.zsh
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
