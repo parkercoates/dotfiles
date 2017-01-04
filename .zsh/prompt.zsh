@@ -201,7 +201,7 @@ function updatePromptInfo()
 }
 
 zle -N updatePromptInfo
-bindkey '^g' updatePromptInfo
+bindkey '^G^G' updatePromptInfo
 
 function TRAPUSR1()
 {
