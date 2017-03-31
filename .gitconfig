@@ -46,6 +46,7 @@
 	mnemonicprefix = true
 	renames = copies
 	tool = kdiff3
+	indentHeuristic = true
 
 [fetch]
 	prune = true
