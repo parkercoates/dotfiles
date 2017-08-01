@@ -86,3 +86,5 @@
 [url "git@git.kde.org:"]
 	pushInsteadOf = kde:
 
+[mergetool]
+	keepBackup = false
