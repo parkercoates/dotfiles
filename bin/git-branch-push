@@ -21,7 +21,6 @@ Usage:
     git branch-push --delete <remote-branch>
         Deletes <remote-branch> on the remote.
 EOF
-    exit $1
 }
 
 fail() {
@@ -29,53 +28,84 @@ fail() {
     exit 1
 }
 
+usageFail() {
+    echo "Error: $@" 1>&2
+    usage
+    exit 1
+}
+
+sourceRef=''
+remoteBranch=''
 promptMode='true'
-case "$1" in
---no-prompt)
-    promptMode='false'
-    shift;
-    ;;
---force)
-    forceMode='true'
-    promptMode='true'
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --no-prompt)
+        promptMode=''
+        ;;
+    --from)
+        sourceRef="$2"
+        shift
+        ;;
+    --force)
+        forceMode='true'
+        ;;
+    --create)
+        createMode='true'
+        ;;
+    --delete)
+        deleteMode='true'
+        ;;
+    --help|-h)
+        usage
+        exit 0
+        ;;
+    -*=*)
+        flag=$(echo "$1" | sed -E 's/(-[^=]+)=.+/\1/')
+        value=$(echo "$1" | sed -E 's/-[^=]+=(.+)/\1/')
+        shift
+        set -- "$flag" "$value" $@
+        continue
+        ;;
+    -*)
+        usageFail "Unrecognized option: \"$1\""
+        ;;
+    *)
+        if [ -n "$remoteBranch" ]; then
+            usageFail 'Too many arguments!'
+        fi
+        remoteBranch="$1"
+    esac
     shift
-    ;;
---create|-c)
-    createMode='true'
-    shift
-    ;;
---delete|-d)
-    deleteMode='true'
-    promptMode='true'
-    shift
-    ;;
---help|-h)
-    usage 0
-    ;;
--*)
-    echo "Unrecognized option: \"$1\"" 1>&2
-    usage 1
-esac
+done
 
-case "$1" in
--*)
-    fail 'Only one option may be given at a time.'
-esac
+if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
+   || [ "$createMode" = 'true' -a "$forceMode" = 'true' ] \
+   || [ "$deleteMode" = 'true' -a "$forceMode" = 'true' ] \
+   || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
+   usageFail 'Incompatible combination of flags'
+fi
 
-if [ -z "$1" ]; then
-    if [ "$forceMode" = 'true' -o "$createMode" = 'true' -o "$deleteMode" = 'true' ]; then
-        usage 1
+if [ -z "$remoteBranch" ]; then
+    if [ "$createMode" = 'true' ]; then
+        usageFail '--create requires a <remote-branch> to be specified.'
+    fi
+    if [ "$deleteMode" = 'true' ]; then
+        usageFail '--delete requires a <remote-branch> to be specified.'
+    fi
+    if [ "$forceMode" = 'true' ]; then
+        usageFail '--force requires a <remote-branch> to be specified.'
+    fi
+    if [ -n "$sourceRef" ]; then
+        usageFail '--from requires a <remote-branch> to be specified.'
     fi
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
     if [ $? -ne 0 ]; then
         fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
     fi
-else
-    remoteBranch=$1
 fi
 
-if [ -n "$2" ]; then
-    usage 1
+if [ -z "$sourceRef" ]; then
+    sourceRef='HEAD'
 fi
 
 remote=$(echo $remoteBranch | cut -d'/' -f1)
@@ -85,7 +115,7 @@ if [ "$remote/$branch" != "$remoteBranch" ]; then
     fail "\"$remoteBranch\" isn't in the format \"<remote>/<branch>\""
 fi
 
-if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; then
+if [ "$(git remote 2> /dev/null | grep $remote)" != "$remote"  ]; then
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
@@ -100,19 +130,21 @@ elif [ "$createMode" != 'true' -a "$remoteBranchExists" != 'true' ]; then
 fi
 
 if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
-    headHash="$(git rev-parse HEAD)"
+    sourceHash="$(git rev-parse $sourceRef)"
     remoteHash="$(git rev-parse $remoteBranch)"
-    if [ "$headHash" = "$remoteHash" ]; then
+    if [ "$sourceHash" = "$remoteHash" ]; then
         echo 'Nothing to push.'
         exit 0
     fi
 
+    commitCount="$(git rev-list --count $remoteHash..$sourceHash)"
     echo 'Commits to push:'
-    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$headHash
+    git --no-pager log --reverse --format=format:' %C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$sourceHash
     echo
+    echo " $commitCount commits total"
     echo
     echo 'Files changed:'
-    git --no-pager diff --stat -M10% $remoteHash..$headHash
+    git --no-pager diff --stat -M10% $remoteHash..$sourceHash
     echo
 fi
 
@@ -131,9 +163,9 @@ fi
 if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
 elif [ "$forceMode" = 'true' ]; then
-    git push --force-with-lease $remote HEAD:$branch
+    git push --force-with-lease $remote $sourceRef:$branch
 else
-    git push $remote HEAD:$branch
+    git push $remote $sourceRef:$branch
 fi
 
 exit $?
