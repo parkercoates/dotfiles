@@ -3,25 +3,50 @@
 usage() {
     cat << EOF
 Usage:
-    git branch-push [<remote-branch>]
-        Pushes HEAD to the <remote-branch>. If <remote-branch> is omitted,
-        it defaults to the current branch's upstream. Either way, <remote
-        -branch> must exist.
-
-    git branch-push --no-prompt [<remote-branch>]
-        The same as above, but the user is not prompted before pushing.
-
-    git branch-push --force <remote-branch>
-        Force pushes HEAD to the <remote-branch>. <remote-branch> must be
-        specified, must exist, and must be up to date with the remote.
-
-    git branch-push --create <remote-branch>
-        Creates <remote-branch> on the remote and pushes HEAD to it.
-
-    git branch-push --delete <remote-branch>
-        Deletes <remote-branch> on the remote.
+    git branch-push [--force] [--from <ref>] [--set-upstream] [--no-prompt] [<remote-branch>]
+    git branch-push --create [--from <ref>] [--set-upstream] [--no-prompt] <remote-branch>
+    git branch-push --delete [--no-prompt] <remote-branch>
 EOF
 }
+
+help() {
+    cat << EOF
+Description:
+    A simpler, prettier, safer interface for git push, which:
+        - supports only single branch operations
+        - pushes HEAD by default
+        - refers to remote branches by slashed name
+        - summarizes the commits and file changes to be pushed
+        - prompts for confirmation before doing the push
+        - makes deleting remote branches very straight forward
+
+EOF
+usage
+    cat << EOF
+
+Options:
+    <remote-branch>
+        The remote branch to push to in the form "<remote>/<branch>". If <remote-branch> is
+        omitted, it defaults to the current branch's upstream. Unless --create is used,
+        <remote-branch> must exist.
+    --create
+        Creates <remote-branch> on the remote and pushes HEAD to it. <remote-branch> must be
+        specified and must not exist.
+    --delete
+        Deletes <remote-branch> from the remote. <remote-branch> must be specified.
+    --force
+        Performs a force push (using --force-with-lease internally). <remote-branch> must be
+        specified.
+    --from <ref>
+        Instead of pushing HEAD, pushes <ref> to <remote-branch>.
+    --set-upstream
+        Identical to git push's --set-upstream.
+    --no-prompt
+        Skips the prompt for confirmation and performs the push immediately.
+EOF
+}
+
+
 
 fail() {
     echo $@ 1>&2
@@ -59,7 +84,7 @@ while [ $# -gt 0 ]; do
         deleteMode='true'
         ;;
     --help|-h)
-        usage
+        help
         exit 0
         ;;
     -*=*)
