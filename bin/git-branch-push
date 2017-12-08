@@ -139,7 +139,7 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
 
     commitCount="$(git rev-list --count $remoteHash..$sourceHash)"
     echo 'Commits to push:'
-    git --no-pager log --reverse --format=format:' %C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$sourceHash
+    git --no-pager log --reverse --use-mailmap --format=format:' %C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$sourceHash
     echo
     echo " $commitCount commits total"
     echo
