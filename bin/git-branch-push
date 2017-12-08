@@ -169,6 +169,15 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
         exit 0
     fi
 
+    reverseCommitCount="$(git rev-list --count $sourceHash..$remoteHash)"
+    if [ $reverseCommitCount -gt 0 -o -n "$forceFlag" ]; then
+        echo "$(tput setaf 1)Commits to rollback:"
+        git --no-pager log --reverse --use-mailmap --format=format:' %C(magenta)%ar %C(green)%an%C(red) %s' $sourceHash..$remoteHash
+        echo
+        echo " $reverseCommitCount commits total$(tput sgr 0)"
+        echo
+    fi
+
     commitCount="$(git rev-list --count $remoteHash..$sourceHash)"
     echo 'Commits to push:'
     git --no-pager log --reverse --use-mailmap --format=format:' %C(magenta)%ar %C(green)%an%Creset %s' $remoteHash..$sourceHash
@@ -181,6 +190,15 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
 fi
 
 echo -e "Destination branch: $(tput setaf 2)$remoteBranch$(tput sgr 0)"
+if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
+    if [ "$reverseCommitCount" -gt 0 -a -z "$forceFlag" ]; then
+        echo
+        echo "$(tput setaf 3)This appears to be a force push without the --force flag.$(tput sgr 0)"
+    elif [ "$reverseCommitCount" -eq 0 -a -n "$forceFlag" ]; then
+        echo
+        echo "$(tput setaf 3)The --force flag appears to be unnecessary.$(tput sgr 0)"
+    fi
+fi
 
 if [ "$promptMode" == 'true' ]; then
     echo
