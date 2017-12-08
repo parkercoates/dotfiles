@@ -47,7 +47,7 @@ while [ $# -gt 0 ]; do
         shift
         ;;
     --force)
-        forceMode='true'
+        forceFlag='--force-with-lease'
         ;;
     --create)
         createMode='true'
@@ -79,8 +79,8 @@ while [ $# -gt 0 ]; do
 done
 
 if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
-   || [ "$createMode" = 'true' -a "$forceMode" = 'true' ] \
-   || [ "$deleteMode" = 'true' -a "$forceMode" = 'true' ] \
+   || [ "$createMode" = 'true' -a -n "$forceFlag" ] \
+   || [ "$deleteMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
    usageFail 'Incompatible combination of flags'
 fi
@@ -92,7 +92,7 @@ if [ -z "$remoteBranch" ]; then
     if [ "$deleteMode" = 'true' ]; then
         usageFail '--delete requires a <remote-branch> to be specified.'
     fi
-    if [ "$forceMode" = 'true' ]; then
+    if [ -n "$forceFlag" ]; then
         usageFail '--force requires a <remote-branch> to be specified.'
     fi
     if [ -n "$sourceRef" ]; then
@@ -163,10 +163,8 @@ fi
 
 if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
-elif [ "$forceMode" = 'true' ]; then
-    git push --force-with-lease $remote $sourceRef:$branch
 else
-    git push $remote $sourceRef:$branch
+    git push $forceFlag $trackFlag $remote $sourceRef:$branch
 fi
 
 exit $?
