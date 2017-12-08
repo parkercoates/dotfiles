@@ -52,6 +52,9 @@ while [ $# -gt 0 ]; do
     --create)
         createMode='true'
         ;;
+    --set-upstream)
+        trackFlag='--set-upstream'
+        ;;
     --delete)
         deleteMode='true'
         ;;
@@ -81,6 +84,7 @@ done
 if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
    || [ "$createMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$forceFlag" ] \
+   || [ "$deleteMode" = 'true' -a -n "$trackFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
    usageFail 'Incompatible combination of flags'
 fi
@@ -94,6 +98,9 @@ if [ -z "$remoteBranch" ]; then
     fi
     if [ -n "$forceFlag" ]; then
         usageFail '--force requires a <remote-branch> to be specified.'
+    fi
+    if [ "$trackFlag" = 'true' ]; then
+        usageFail '--track requires a <remote-branch> to be specified.'
     fi
     if [ -n "$sourceRef" ]; then
         usageFail '--from requires a <remote-branch> to be specified.'
