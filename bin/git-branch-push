@@ -90,9 +90,16 @@ while [ $# -gt 0 ]; do
     -*=*)
         flag=$(echo "$1" | sed -E 's/(-[^=]+)=.+/\1/')
         value=$(echo "$1" | sed -E 's/-[^=]+=(.+)/\1/')
-        shift
-        set -- "$flag" "$value" $@
-        continue
+        case "$flag" in
+        --from)
+            shift
+            set -- "$flag" "$value" $@
+            continue
+            ;;
+        *)
+            usageFail "$value given to $flag, which does not accept values."
+            ;;
+        esac
         ;;
     -*)
         usageFail "Unrecognized option: \"$1\""
@@ -184,6 +191,7 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
     echo
     echo " $commitCount commits total"
     echo
+
     echo 'Files changed:'
     git --no-pager diff --stat -M10% $remoteHash..$sourceHash
     echo
