@@ -93,7 +93,7 @@ if [ "$mergeBase" = "$remoteHash" ]; then
 else
     echo
     echo 'Incoming commits:'
-    git --no-pager log --reverse --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $mergeBase..$remoteHash
+    git --no-pager log --reverse --use-mailmap --format=format:'%C(magenta)%ar %C(green)%an%Creset %s' $mergeBase..$remoteHash
     echo
     echo
     echo 'Files changed:'
