@@ -3,29 +3,44 @@
 usage() {
     cat << EOF
 Usage:
-    git branch-pull [--ff-only|--rebase|--merge] [<remote-branch>]
-        Fetches the latest changes to <remote-branch> and integrates them into
-        the current branch. If <remote-branch> is omitted, it defaults to the
-        current branch's upstream.
-
-        --fetch-only
-            Fetch the lastest changes, without integrating them.
-
-        --ff-only
-            Only attempt a fast-forward merge.
-
-        --rebase
-            Rebase local commits on top of the remote branch. This is the
-            default behaviour.
-
-        --merge
-            Merges the remote branch into the current branch.
+    git branch-pull [--fetch-only|--ff-only|--rebase|--merge] [<remote-branch>]
 EOF
-    exit $1
+}
+
+help() {
+    cat << EOF
+Description:
+    A simpler interface for git pull, which:
+        - refers to remote branches by slashed name
+        - summarizes the commits and file changes to be pulled
+
+EOF
+usage
+    cat << EOF
+
+Options:
+    <remote-branch>
+        The remote branch to pull to in the form "<remote>/<branch>". If <remote-branch> is
+        omitted, it defaults to the current branch's upstream.
+    --fetch-only
+        Fetch the lastest changes, without integrating them.
+    --ff-only
+        Only attempt a fast-forward merge.
+    --merge
+        Merges the remote branch into the current branch.
+    --rebase
+        Rebase local commits on top of the remote branch. This is the default behaviour.
+EOF
 }
 
 fail() {
     echo $@ 1>&2
+    exit 1
+}
+
+usageFail() {
+    echo "Error: $@" 1>&2
+    usage
     exit 1
 }
 
@@ -46,16 +61,17 @@ case "$1" in
     shift
     ;;
 --help|-h)
-    usage 0
+    help
+    exit 0
     ;;
 -*)
-    echo "Unrecognized option: \"$1\"" 1>&2
-    usage 1
+    usageFail "Unrecognized option: \"$1\""
+    ;;
 esac
 
 case "$1" in
 -*)
-    fail 'Only one option may be given at a time.'
+    usageFail 'Only one option may be given at a time.'
 esac
 
 if [ -z "$1" ]; then
