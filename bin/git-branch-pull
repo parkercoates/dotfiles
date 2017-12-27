@@ -44,47 +44,51 @@ usageFail() {
     exit 1
 }
 
-case "$1" in
---fetch-only)
-    fetchOnlyMode='true'
+remoteBranch=''
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --fetch-only)
+        fetchOnlyMode='true'
+        ;;
+    --ff-only)
+        ffOnlyMode='true'
+        ;;
+    --merge)
+        mergeMode='true'
+        ;;
+    --rebase)
+        rebaseMode='true'
+        ;;
+    --help|-h)
+        help
+        exit 0
+        ;;
+    -*)
+        usageFail "Unrecognized option: \"$1\""
+        ;;
+    *)
+        if [ -n "$remoteBranch" ]; then
+            usageFail 'Too many arguments!'
+        fi
+        remoteBranch="$1"
+    esac
     shift
-    ;;
---ff-only)
-    ffOnlyMode='true'
-    shift
-    ;;
---rebase)
-    shift
-    ;;
---merge)
-    mergeMode='true'
-    shift
-    ;;
---help|-h)
-    help
-    exit 0
-    ;;
--*)
-    usageFail "Unrecognized option: \"$1\""
-    ;;
-esac
+done
 
-case "$1" in
--*)
-    usageFail 'Only one option may be given at a time.'
-esac
+if [ "$fetchOnlyMode" = 'true' -a "$ffOnlyMode" = 'true' ] \
+   || [ "$fetchOnlyMode" = 'true' -a "$mergeMode" = 'true' ] \
+   || [ "$fetchOnlyMode" = 'true' -a "$rebaseMode" = 'true' ] \
+   || [ "$ffOnlyMode" = 'true' -a "$mergeMode" = 'true' ] \
+   || [ "$ffOnlyMode" = 'true' -a "$rebaseMode" = 'true' ] \
+   || [ "$mergeMode" = 'true' -a "$rebaseMode" = 'true' ]; then
+   usageFail 'Incompatible combination of flags'
+fi
 
-if [ -z "$1" ]; then
+if [ -z "$remoteBranch" ]; then
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
     if [ $? -ne 0 ]; then
         fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
     fi
-else
-    remoteBranch=$1
-fi
-
-if [ -n "$2" ]; then
-    usage 1
 fi
 
 remote=$(echo $remoteBranch | cut -d'/' -f1)
