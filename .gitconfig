@@ -22,9 +22,6 @@
 	unstage = reset HEAD
 	wipi = wip --index-only
 
-[branch]
-	autosetuprebase = always
-
 [cola]
 	tabwidth = 4
 	textwidth = 70
@@ -70,6 +67,12 @@
 [merge "ours"]
 	driver = true
 
+[mergetool]
+	keepBackup = false
+
+[pull]
+	rebase = true
+
 [push]
 	default = simple
 
@@ -85,6 +88,3 @@
 
 [url "git@git.kde.org:"]
 	pushInsteadOf = kde:
-
-[mergetool]
-	keepBackup = false
