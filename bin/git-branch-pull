@@ -102,6 +102,11 @@ if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; t
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
+currentBranch="$(git rev-parse --abbrev-ref HEAD)"
+if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
+    fail "You don't appear to be on a branch."
+fi
+
 echo 'Fetching:'
 git fetch $remote || exit 1
 
