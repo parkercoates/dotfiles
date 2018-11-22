@@ -3,7 +3,7 @@
 usage() {
     cat << EOF
 Usage:
-    git branch-pull [--fetch-only|--ff-only|--rebase|--merge] [<remote-branch>]
+    git branch-pull [--fetch-only|--ff-only|--merge|--rebase [--autostash]] [<remote-branch>]
 EOF
 }
 
@@ -30,6 +30,8 @@ Options:
         Merges the remote branch into the current branch.
     --rebase
         Rebase local commits on top of the remote branch. This is the default behaviour.
+    --autostash
+        Can only be used when rebasing. See 'git pull --help' for details.
 EOF
 }
 
@@ -58,6 +60,9 @@ while [ $# -gt 0 ]; do
         ;;
     --rebase)
         rebaseMode='true'
+        ;;
+    --autostash)
+        autostashFlag='--autostash'
         ;;
     --help|-h)
         help
@@ -115,25 +120,27 @@ remoteHash="$(git rev-parse $remoteBranch)"
 mergeBase="$(git merge-base HEAD "$remoteBranch")"
 if [ "$mergeBase" = "$remoteHash" ]; then
     echo 'Already up to date.'
-else
-    echo
-    echo 'Incoming commits:'
-    git --no-pager log --reverse --use-mailmap --format=format:'%C(magenta)%ar %C(green)%aN%Creset %s' $mergeBase..$remoteHash
-    echo
-    echo
-    echo 'Files changed:'
-    git --no-pager diff --stat $mergeBase..$remoteHash
-    echo
+    exit 0
+fi
 
-    if [ "$fetchOnlyMode" != 'true' ]; then
-        if [ "$ffOnlyMode" = 'true' -a "$mergeBase" != "$headHash" ]; then
-            fail 'Fast forward merge not possible.'
-        elif [ "$mergeMode" = 'true' ]; then
-            git merge $remoteBranch
-        else
-            git rebase --autostash $remoteBranch
-        fi
-        exit $?
+echo
+echo 'Incoming commits:'
+git --no-pager log --reverse --use-mailmap --format=format:'%C(magenta)%ar %C(green)%aN%Creset %s' $mergeBase..$remoteHash
+echo
+echo
+echo 'Files changed:'
+git --no-pager diff --stat $mergeBase..$remoteHash
+echo
+
+
+if [ "$fetchOnlyMode" != 'true' ]; then
+    if [ "$ffOnlyMode" = 'true' -a "$mergeBase" != "$headHash" ]; then
+        fail 'Fast forward merge not possible.'
+    elif [ "$mergeMode" = 'true' ]; then
+        git merge $remoteBranch
+    else
+        git rebase $autostashFlag $remoteBranch
     fi
+    exit $?
 fi
 
