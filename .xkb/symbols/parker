@@ -14,6 +14,9 @@ xkb_symbols "altgr-intl" {
     key <FK03> { [ F3, F3, U266B, U2665 ] };
     key <FK04> { [ F4, F4, U266C, U2666 ] };
 
+// Replace generic currency sign with the Euro
+    key <AE04> { [ 3, dollar, sterling, EuroSign ] };
+
 // Empty set 
     key <AE10> { [ 0, parenright, emptyset, dead_abovering ] };
 
