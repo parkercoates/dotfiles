@@ -29,7 +29,7 @@ Options:
     --merge
         Merges the remote branch into the current branch.
     --rebase
-        Rebase local commits on top of the remote branch. This is the default behaviour.
+        Rebase local commits on top of the remote branch.
     --autostash
         Can only be used when rebasing. See 'git pull --help' for details.
 EOF
@@ -89,6 +89,32 @@ if [ "$fetchOnlyMode" = 'true' -a "$ffOnlyMode" = 'true' ] \
    usageFail 'Incompatible combination of flags'
 fi
 
+
+currentBranch="$(git rev-parse --abbrev-ref HEAD)"
+if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
+    fail "You don't appear to be on a branch."
+fi
+
+# If no mode was specified, we must choose between rebase and merge based on
+# the user's Git configuration, first checking the branch's rebase policy if
+# set, then the global rebase policy if set, otherwise defaulting to merging.
+# This hopefully offers identical behaviour to git pull.
+if [ "$fetchOnlyMode" != 'true' -a "$ffOnlyMode" != 'true' -a "$mergeMode" != 'true' -a "$rebaseMode" != 'true' ]; then
+    rebaseMode="$(git config --type=bool --get branch.$currentBranch.rebase)"
+    if [ $? -ne 0 -o -z "$rebaseMode" ]; then
+        rebaseMode="$(git config --type=bool --get pull.rebase)"
+        if [ $? -ne 0 -o -z "$rebaseMode" ]; then
+            rebaseMode=''
+            mergeMode='true'
+        fi
+    fi
+fi
+
+if [ "$rebaseMode" != 'true' -a -n "$autostashFlag" ]; then
+    fail "--autostash can only be used when rebasing."
+fi
+
+
 if [ -z "$remoteBranch" ]; then
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
     if [ $? -ne 0 ]; then
@@ -107,10 +133,6 @@ if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; t
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
-currentBranch="$(git rev-parse --abbrev-ref HEAD)"
-if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
-    fail "You don't appear to be on a branch."
-fi
 
 echo 'Fetching:'
 git fetch $remote || exit 1
