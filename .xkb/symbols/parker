@@ -8,17 +8,17 @@ xkb_symbols "altgr-intl" {
     key <SCLK> { [ Caps_Lock ] };
     key <RWIN> { [ Multi_key ] };
 
-
+// Music notes and card suits
     key <FK01> { [ F1, F1, U2669, U2660 ] };
     key <FK02> { [ F2, F2, U266A, U2663 ] };
     key <FK03> { [ F3, F3, U266B, U2665 ] };
     key <FK04> { [ F4, F4, U266C, U2666 ] };
 
 // Empty set 
-    key <AE10> { [ 0, parenright, U2205, dead_abovering ] };
+    key <AE10> { [ 0, parenright, emptyset, dead_abovering ] };
 
 // Dagger and double dagger
-    key <AC03> { [ d, D, U2020, U2021 ] };
+    key <AC03> { [ d, D, dagger, doubledagger ] };
 
 // Happy and sad faces
     key <AC04> { [ f, F, U263A, U2639 ] };
@@ -26,20 +26,20 @@ xkb_symbols "altgr-intl" {
 // R makes more sense to me for registed trademarks
     key <AD04> { [ r, R, registered, trademark ] };
 
-// Infinity
-    key <AD08> { [ i, I, U221E, U222B ] };
+// Infinity and integral
+    key <AD08> { [ i, I, infinity, integral ] };
 
 // Plus minus and minus plus
-    key <AD10> { [ p, P, U00B1, U2213 ] };
+    key <AD10> { [ p, P, plusminus, U2213 ] };
 
 // Lambda on the backslash key
-    key <BKSL> { [ backslash, bar, U03BB, brokenbar ] };
+    key <BKSL> { [ backslash, bar, Greek_lambda, brokenbar ] };
 
 // Arrows from cursor keys
-    key <LEFT> { [ Left,  Left,  U2190, U2196 ] };
-    key <UP>   { [ Up,    Up,    U2191, U2197 ] };
-    key <RGHT> { [ Right, Right, U2192, U2198 ] };
-    key <DOWN> { [ Down,  Down,  U2193, U2199 ] };
+    key <LEFT> { [ Left,  Left,  leftarrow, U2196 ] };
+    key <UP>   { [ Up,    Up,    uparrow, U2197 ] };
+    key <RGHT> { [ Right, Right, rightarrow, U2198 ] };
+    key <DOWN> { [ Down,  Down,  downarrow, U2199 ] };
 
 // Check boxes
     key <AB02> { [ x, X, U2611, U2610 ] };
@@ -48,10 +48,10 @@ xkb_symbols "altgr-intl" {
     key <AB04> { [ v, V, UFFFD, V ] };
 
 // Bullets
-    key <AB05> { [ b, B, U2022, U25E6 ] };
+    key <AB05> { [ b, B, enfilledcircbullet, enopencircbullet ] };
 
 // Ellipsis
-    key <AB09>  { [ period, greater, U2026, dead_abovedot ] };
+    key <AB09>  { [ period, greater, ellipsis, dead_abovedot ] };
 
 // Interrobang
     key <AB10> { [ slash, question, questiondown, U203D ] };
