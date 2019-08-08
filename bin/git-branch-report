@@ -1,0 +1,18 @@
+#! /bin/bash
+
+remote=${1:-origin}
+mergeReference=${2:-$remote/master}
+
+echo "Fetching and pruning $remote branches..." 1>&2
+git fetch --prune $remote 1>&2
+
+echo "Fully Merged to $mergeReference,Branch,Last Committer,Last Commit Date"
+for branch in $(git for-each-ref refs/remotes/$remote --sort=-committerdate --sort=committername --format='%(refname)' | grep -v HEAD); do
+    echo "Checking $branch..." 1>&2
+    if git merge-base --is-ancestor $branch ${mergeReference}; then
+        echo -n 'yes,'
+    else
+        echo -n ','
+    fi
+    git for-each-ref $branch --format='%(refname:strip=3),%(committername),"%(committerdate:short) (%(committerdate:relative))"'
+done
