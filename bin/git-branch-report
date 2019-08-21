@@ -6,13 +6,17 @@ mergeReference=${2:-$remote/master}
 echo "Fetching and pruning $remote branches..." 1>&2
 git fetch --prune $remote 1>&2
 
-echo "Fully Merged to $mergeReference,Branch,Last Committer,Last Commit Date"
-for branch in $(git for-each-ref refs/remotes/$remote --sort=-committerdate --sort=committername --format='%(refname)' | grep -v HEAD); do
-    echo "Checking $branch..." 1>&2
-    if git merge-base --is-ancestor $branch ${mergeReference}; then
-        echo -n 'yes,'
-    else
-        echo -n ','
-    fi
-    git for-each-ref $branch --format='%(refname:strip=3),%(committername),"%(committerdate:short) (%(committerdate:relative))"'
-done
+echo "Branch,Fully Merged to $mergeReference,Last Committer,Last Commit Date"
+
+function generateRows() {
+    for branch in $(git for-each-ref refs/remotes/$remote --format='%(refname:strip=3)' | grep -v HEAD); do
+        echo "Checking $branch..." 1>&2
+        echo -n "$branch,"
+        if git merge-base --is-ancestor "$remote/$branch" ${mergeReference}; then
+            echo -n 'yes'
+        fi
+        git --no-pager show --no-patch --format=',%cN,"%cd (%cr)"' --date=short "$remote/$branch"
+    done
+}
+
+generateRows | sort --field-separator=, --key=4r | sort --field-separator=, --key=3,3 --stable
