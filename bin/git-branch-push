@@ -5,6 +5,7 @@ usage() {
 Usage:
     git branch-push [--force] [--from <ref>] [--set-upstream] [--no-prompt] [<remote-branch>]
     git branch-push --create [--from <ref>] [--set-upstream] [--no-prompt] <remote-branch>
+    git branch-push --create-from-current [--no-prompt] <remote>
     git branch-push --delete [--no-prompt] <remote-branch>
 EOF
 }
@@ -32,6 +33,9 @@ Options:
     --create
         Creates <remote-branch> on the remote and pushes HEAD to it. <remote-branch> must be
         specified and must not exist.
+    --create-from-current
+        Creates a branch on <remote> with the same name as the current branch and sets the
+        new branch as the upstream of the current branch.
     --delete
         Deletes <remote-branch> from the remote. <remote-branch> must be specified.
     --force
@@ -44,7 +48,6 @@ Options:
         Skips the prompt for confirmation and performs the push immediately.
 EOF
 }
-
 
 
 fail() {
@@ -76,6 +79,9 @@ while [ $# -gt 0 ]; do
         ;;
     --create)
         createMode='true'
+        ;;
+    --create-from-current)
+        createFromCurrentMode='true'
         ;;
     --set-upstream)
         setUpstreamFlag='--set-upstream'
@@ -113,8 +119,19 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+if [ "$createFromCurrentMode" = 'true' ]; then
+    if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
+        fail "You don't appear to be on a branch."
+    fi
+    createMode='true'
+    setUpstreamFlag='--set-upstream'
+    remoteBranch="$remoteBranch/$currentBranch"
+fi
+
 if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
    || [ "$createMode" = 'true' -a -n "$forceFlag" ] \
+   || [ "$createFromCurrentMode" = 'true' -a "$deleteMode" = 'true' ] \
+   || [ "$createFromCurrentMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$setUpstreamFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
