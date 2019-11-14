@@ -58,6 +58,7 @@ usageFail() {
     exit 1
 }
 
+currentBranch="$(git rev-parse --abbrev-ref HEAD)"
 sourceRef=''
 remoteBranch=''
 promptMode='true'
@@ -120,6 +121,17 @@ if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
    usageFail 'Incompatible combination of flags'
 fi
 
+if [ -n "$sourceRef" ]; then
+    if [ -z "$remoteBranch" ]; then
+        distance=$(git merge-base --is-ancestor "$sourceRef" "$currentBranch" && git rev-list --count $sourceRef..$currentBranch)
+        if [ -z "$distance" ] || [ "$distance" -gt 25 ]; then
+            fail "A <remote-branch> must be specified as \"$sourceRef\" is not a recent commit on the current branch."
+        fi
+    fi
+else
+    sourceRef='HEAD'
+fi
+
 if [ -z "$remoteBranch" ]; then
     if [ "$createMode" = 'true' ]; then
         usageFail '--create requires a <remote-branch> to be specified.'
@@ -130,17 +142,10 @@ if [ -z "$remoteBranch" ]; then
     if [ -n "$setUpstreamFlag" ]; then
         usageFail '--set-upstream requires a <remote-branch> to be specified.'
     fi
-    if [ -n "$sourceRef" ]; then
-        usageFail '--from requires a <remote-branch> to be specified.'
-    fi
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
     if [ $? -ne 0 ]; then
-        fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
+        fail "Unable to find an upstream branch for \"$currentBranch\"."
     fi
-fi
-
-if [ -z "$sourceRef" ]; then
-    sourceRef='HEAD'
 fi
 
 remote=$(echo $remoteBranch | cut -d'/' -f1)
