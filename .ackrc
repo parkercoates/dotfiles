@@ -1,4 +1,5 @@
 --smart-case
+--sort-files
 --type-set=hpp=.h,.hpp
 --type-set=qmake=.pro
 --type-set=qtui=.ui
