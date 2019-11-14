@@ -3,4 +3,4 @@
 .~*
 *.autosave
 
-CMakeLists.txt.user
+CMakeLists.txt.user*
