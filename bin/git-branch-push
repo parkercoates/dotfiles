@@ -35,8 +35,7 @@ Options:
     --delete
         Deletes <remote-branch> from the remote. <remote-branch> must be specified.
     --force
-        Performs a force push (using --force-with-lease internally). <remote-branch> must be
-        specified.
+        Performs a force push (using --force-with-lease internally).
     --from <ref>
         Instead of pushing HEAD, pushes <ref> to <remote-branch>.
     --set-upstream
@@ -127,9 +126,6 @@ if [ -z "$remoteBranch" ]; then
     fi
     if [ "$deleteMode" = 'true' ]; then
         usageFail '--delete requires a <remote-branch> to be specified.'
-    fi
-    if [ -n "$forceFlag" ]; then
-        usageFail '--force requires a <remote-branch> to be specified.'
     fi
     if [ "$trackFlag" = 'true' ]; then
         usageFail '--track requires a <remote-branch> to be specified.'
