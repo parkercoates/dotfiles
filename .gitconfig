@@ -14,6 +14,7 @@
 	branch-ages = for-each-ref --sort=committerdate refs/remotes refs/heads --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:green)%(committerdate:relative)%(color:reset) - %(authorname)'
 	ignored = ls-files -o -i --exclude-standard
 	last-week = !git log --all --author=\"$(git config user.name)\" --since='2 sunday ago' --until='1 sunday ago' --date-order --reverse --date=short --format=format:'%C(blue)%cd %C(yellow)(%cr) %C(green)%h %Creset%s'
+	last-two-weeks = !git log --all --author=\"$(git config user.name)\" --since='3 sunday ago' --until='1 sunday ago' --date-order --reverse --date=short --format=format:'%C(blue)%cd %C(yellow)(%cr) %C(green)%h %Creset%s'
 	merge-tool = mergetool
 	plog = log --graph --format=format:'%C(bold blue)%h%Creset%C(bold magenta)%d%Creset %C(green)%an%Creset %s %C(yellow)(%cr)'
 	qr = quick-rebase
