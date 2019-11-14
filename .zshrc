@@ -25,12 +25,7 @@ WORDCHARS='_-'
 
 export PATH=~/bin:$PATH
 
-if [[ -f ~/source/qps-dev-env.sh ]]; then
-    source ~/source/qps-dev-env.sh
-fi
-#source ~/kde-devel/setup/kde-devel-env.sh
-
-
+source $ZSH/development.sh
 
 source $ZSH/aliases.zsh
 
