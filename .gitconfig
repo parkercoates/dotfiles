@@ -84,6 +84,9 @@
 [rerere]
 	enabled = true
 
+[revise]
+	autoSquash = true
+
 [url "git://anongit.kde.org/"]
 	insteadOf = kde:
 
