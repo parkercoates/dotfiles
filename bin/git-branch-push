@@ -77,7 +77,7 @@ while [ $# -gt 0 ]; do
         createMode='true'
         ;;
     --set-upstream)
-        trackFlag='--set-upstream'
+        setUpstreamFlag='--set-upstream'
         ;;
     --delete)
         deleteMode='true'
@@ -115,7 +115,7 @@ done
 if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
    || [ "$createMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$forceFlag" ] \
-   || [ "$deleteMode" = 'true' -a -n "$trackFlag" ] \
+   || [ "$deleteMode" = 'true' -a -n "$setUpstreamFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
    usageFail 'Incompatible combination of flags'
 fi
@@ -127,8 +127,8 @@ if [ -z "$remoteBranch" ]; then
     if [ "$deleteMode" = 'true' ]; then
         usageFail '--delete requires a <remote-branch> to be specified.'
     fi
-    if [ "$trackFlag" = 'true' ]; then
-        usageFail '--track requires a <remote-branch> to be specified.'
+    if [ -n "$setUpstreamFlag" ]; then
+        usageFail '--set-upstream requires a <remote-branch> to be specified.'
     fi
     if [ -n "$sourceRef" ]; then
         usageFail '--from requires a <remote-branch> to be specified.'
@@ -218,7 +218,7 @@ fi
 if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
 else
-    git push $forceFlag $trackFlag $remote $sourceRef:$branch
+    git push $forceFlag $setUpstreamFlag $remote $sourceRef:$branch
 fi
 
 exit $?
