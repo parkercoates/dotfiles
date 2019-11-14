@@ -62,7 +62,7 @@
 	decorate = short
 
 [merge]
-	renamelimit=0
+	renameLimit=0
 	tool = kdiff3
 
 [merge "ours"]
