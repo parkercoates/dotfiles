@@ -122,6 +122,8 @@ done
 if [ "$createFromCurrentMode" = 'true' ]; then
     if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
         fail "You don't appear to be on a branch."
+    elif [ -z "$remoteBranch" ]; then
+        usageFail "You must specify a remote on which to create the branch."
     fi
     createMode='true'
     setUpstreamFlag='--set-upstream'
