@@ -46,6 +46,8 @@ Options:
         Identical to git push's --set-upstream.
     --no-prompt
         Skips the prompt for confirmation and performs the push immediately.
+    --no-verify
+        Skips the pre-push hook.
 EOF
 }
 
@@ -69,6 +71,9 @@ while [ $# -gt 0 ]; do
     case "$1" in
     --no-prompt)
         promptMode=''
+        ;;
+    --no-verify)
+        noVerifyFlag='--no-verify'
         ;;
     --from)
         sourceRef="$2"
@@ -136,6 +141,7 @@ if [ "$createMode" = 'true' -a "$deleteMode" = 'true' ] \
    || [ "$createFromCurrentMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$forceFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$setUpstreamFlag" ] \
+   || [ "$deleteMode" = 'true' -a -n "$noVerifyFlag" ] \
    || [ "$deleteMode" = 'true' -a -n "$sourceRef" ]; then
    usageFail 'Incompatible combination of flags'
 fi
@@ -242,7 +248,7 @@ fi
 if [ "$deleteMode" = 'true' ]; then
     git push $remote --delete $branch
 else
-    git push $forceFlag $setUpstreamFlag $remote $sourceRef:$branch
+    git push $forceFlag $noVerifyFlag $setUpstreamFlag $remote $sourceRef:$branch
 fi
 
 exit $?
