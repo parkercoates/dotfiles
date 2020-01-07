@@ -118,7 +118,7 @@ fi
 if [ -z "$remoteBranch" ]; then
     remoteBranch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)
     if [ $? -ne 0 ]; then
-        fail "Unable to find an upstream branch for \"$(git rev-parse --abbrev-ref HEAD)\"."
+        fail "Unable to find an upstream branch for \"$currentBranch\"."
     fi
 fi
 
