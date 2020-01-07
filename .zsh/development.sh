@@ -60,6 +60,12 @@ function cs()
     return $?
 }
 
+function cmg()
+{
+    echo "$(findroot)/build"
+    cmake-gui "$(findroot)/build"  &>/dev/null&|
+}
+
 function bld()
 {
     flags=''
