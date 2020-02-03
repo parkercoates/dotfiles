@@ -70,6 +70,11 @@ function cmg()
     cmake-gui "$(findbuild)"  &>/dev/null&|
 }
 
+function istarget()
+{
+    ninja -C "$(findbuild)" -t targets all | grep "^$1:" > /dev/null;
+}
+
 function bld()
 {
     flags=''
@@ -86,19 +91,12 @@ function bld()
         shift
     done
 
-    rootDir="$(findroot)"
-    buildDir="$rootDir/build"
-
     if [ -z "$targets" ]; then
-        if [ "$PWD" = "$rootDir" -o "$PWD" = "$buildDir" ]; then
-            targets="all"
+        nameTarget=$(basename $PWD)
+        if istarget "$nameTarget"; then
+            targets="$nameTarget"
         else
-            dirTarget=$(basename $PWD)
-            if ninja -C $buildDir -t targets all | grep "^$dirTarget:" > /dev/null; then
-                targets="$dirTarget"
-            else
-                targets="all"
-            fi
+            targets="all"
         fi
         echo "Automatically chose target: $targets"
     fi
