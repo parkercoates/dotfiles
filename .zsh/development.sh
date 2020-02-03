@@ -129,5 +129,5 @@ function run()
 
 function bldrun()
 {
-    bld "$1" && run "$1"
+    bld "$1" && run "$@"
 }
