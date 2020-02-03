@@ -27,6 +27,11 @@ function findroot()
     git rev-parse --show-toplevel
 }
 
+function findbuild()
+{
+    echo "$(findroot)/build"
+}
+
 function cdroot()
 {
     root=$(findroot) || return $?
@@ -34,10 +39,10 @@ function cdroot()
     return $?
 }
 
-
 function mcb()
 {
-    cdroot && mkdir -p 'build' && cd 'build'
+    buildDir=$(findbuild)
+    mkdir -p "$buildDir" && cd "$buildDir"
 }
 
 function cb()
@@ -62,8 +67,7 @@ function cs()
 
 function cmg()
 {
-    echo "$(findroot)/build"
-    cmake-gui "$(findroot)/build"  &>/dev/null&|
+    cmake-gui "$(findbuild)"  &>/dev/null&|
 }
 
 function bld()
@@ -99,7 +103,7 @@ function bld()
         echo "Automatically chose target: $targets"
     fi
 
-    eval "ninja -C $buildDir $flags $targets"
+    eval "ninja -C \"$(findbuild)\" $flags $targets"
 }
 
 function cln()
