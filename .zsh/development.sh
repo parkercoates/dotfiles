@@ -92,8 +92,13 @@ function bld()
     done
 
     if [ -z "$targets" ]; then
+        rootDir="$(findroot)"
+        relDir="$(echo $PWD | sed -e "s:$rootDir::")"
+        folderTarget="folder$(echo $relDir | sed -e "s:/:-:g")"
         nameTarget=$(basename $PWD)
-        if istarget "$nameTarget"; then
+        if istarget "$folderTarget"; then
+            targets="$folderTarget"
+        elif istarget "$nameTarget"; then
             targets="$nameTarget"
         else
             targets="all"
