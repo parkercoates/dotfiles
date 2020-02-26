@@ -1,0 +1,21 @@
+#! /bin/sh
+
+for inFile in "$@"; do
+    path=$(dirname "$inFile")
+    base=$(basename -s .png "$inFile")
+    outFile="${path}/${base}-reduced.png"
+
+    pngcrush -fix -rem allb "$inFile" "$outFile" && optipng -o7 "$outFile" || exit 1
+
+    inSize=$(wc -c < "$inFile")
+    outSize=$(wc -c < "$outFile")
+
+    echo
+    echo "======================================"
+    echo "         File: $inFile:"
+    echo "Original size: $inSize bytes"
+    echo " Reduced size: $outSize bytes"
+    echo "    Reduction: $((inSize - outSize)) bytes ($(( (inSize - outSize) * 100 / inSize ))%)"
+    echo "======================================"
+    echo
+done
