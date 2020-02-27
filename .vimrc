@@ -5,8 +5,7 @@ set shiftwidth=4
 set expandtab
 set autoindent
 
-set lcs=tab:»·
-set lcs+=trail:·
+set listchars=tab:»·,space:·
 set list
 
 set number
