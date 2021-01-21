@@ -1,0 +1,91 @@
+#! /bin/sh
+
+usage() {
+    cat << EOF
+Usage:
+    git fast-forward <local-branch> [<source-ref>]
+EOF
+}
+
+help() {
+    cat << EOF
+Description:
+    A simple interface to fast-forward a branch without checking it out.
+
+EOF
+usage
+    cat << EOF
+
+Options:
+    <local-branch>
+        The local branch to fast forward.
+    <source-ref>
+        The remote branch to pull to in the form "<remote>/<branch>". If <source-ref> is
+        omitted, it defaults to the upstream of <local-branch>.
+EOF
+}
+
+fail() {
+    echo $@ 1>&2
+    exit 1
+}
+
+usageFail() {
+    echo "Error: $@" 1>&2
+    usage
+    exit 1
+}
+
+localBranch=''
+sourceRef=''
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --help|-h)
+        help
+        exit 0
+        ;;
+    -*)
+        usageFail "Unrecognized option: \"$1\""
+        ;;
+    *)
+        if [ -z "$localBranch" ]; then
+            localBranch="$1"
+        elif [ -z "$sourceRef" ]; then
+            sourceRef="$1"
+        else
+            usageFail 'Too many arguments!'
+        fi
+    esac
+    shift
+done
+
+if [ -z "$localBranch" ]; then
+    fail "No local branch specified."
+fi
+
+localBranchListing=$(git branch 2> /dev/null | grep -E " $localBranch$")
+if [ -z "$localBranchListing" ]; then
+    fail "\"$localBranch\" is not a local branch."
+elif echo "$localBranchListing" | grep -E '^\*' 1> /dev/null; then
+    fail "\"$localBranch\" is the current branch. Use 'git merge --ff-only' instead."
+elif echo "$localBranchListing" | grep -E '^\+' 1> /dev/null; then
+    fail "\"$localBranch\" is currently checked out in another worktree."
+fi
+
+if [ -z "$sourceRef" ]; then
+    sourceRef=$(git rev-parse --abbrev-ref --symbolic-full-name $localBranch@{u} 2> /dev/null)
+    if [ $? -ne 0 ]; then
+        fail "Unable to find an upstream branch for \"$localBranch\"."
+    fi
+elif ! git rev-parse --verify --quiet $sourceRef; then
+    fail "\"$sourceRef\" is not a valid source."
+fi
+
+if git rev-parse --verify --quiet "remotes/$sourceRef" > /dev/null; then
+    remote=$(echo $sourceRef | cut -d'/' -f1)
+    sourceRef=$(echo $sourceRef | sed "s:^$remote/::")
+else
+    remote='.'
+fi
+
+git fetch $remote $sourceRef:$localBranch
