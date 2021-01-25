@@ -10,7 +10,7 @@ EOF
 help() {
     cat << EOF
 Description:
-    A simple interface to fast-forward a branch without checking it out.
+    A simple tool to fast-forward a branch that is not currently checked out.
 
 EOF
 usage
@@ -18,15 +18,17 @@ usage
 
 Options:
     <local-branch>
-        The local branch to fast forward.
+        The local branch to fast-forward.
     <source-ref>
-        The remote branch to pull to in the form "<remote>/<branch>". If <source-ref> is
-        omitted, it defaults to the upstream of <local-branch>.
+        The commit or branch to update the branch to. If <source-ref> is a
+        remote tracking branch, that branch will be fetched from the remote
+        before fast-forwarding. If <source-ref> is omitted, it defaults to the
+        upstream of <local-branch>.
 EOF
 }
 
 fail() {
-    echo $@ 1>&2
+    echo "Error: $@" 1>&2
     exit 1
 }
 
@@ -60,7 +62,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$localBranch" ]; then
-    fail "No local branch specified."
+    usagefail "No local branch specified."
 fi
 
 localBranchListing=$(git branch 2> /dev/null | grep -E " $localBranch$")
