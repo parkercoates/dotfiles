@@ -5,9 +5,9 @@ usage() {
 Usage:
     git branch-push [--force] [--from <ref>] [--set-upstream] [--no-prompt] [<remote-branch>]
     git branch-push --create [--from <ref>] [--set-upstream] [--no-prompt] <remote-branch>
-    git branch-push --create-from-current [--no-prompt] <remote>
+    git branch-push --create-from-current [--no-prompt] [<remote>]
     git branch-push --delete [--no-prompt] <remote-branch>
-    git branch-push --delete-from-current [--no-prompt] <remote>
+    git branch-push --delete-from-current [--no-prompt] [<remote>]
 EOF
 }
 
@@ -36,11 +36,12 @@ Options:
         specified and must not exist.
     --create-from-current
         Creates a branch on <remote> with the same name as the current branch and sets the
-        new branch as the upstream of the current branch.
+        new branch as the upstream of the current branch. <remote> defaults to "origin".
     --delete
         Deletes <remote-branch> from the remote. <remote-branch> must be specified.
     --delete-from-current
-        Deletes the branch on <remote> with the same name as the current branch.
+        Deletes the branch on <remote> with the same name as the current branch. <remote>
+        defaults to "origin".
     --force
         Performs a force push (using --force-with-lease internally).
     --from <ref>
@@ -137,7 +138,7 @@ if [ "$branchFromCurrentMode" = 'true' ]; then
     if [ -z "$currentBranch" -o "$currentBranch" == 'HEAD' ]; then
         fail "You don't appear to be on a branch."
     elif [ -z "$remoteBranch" ]; then
-        usageFail "You must specify a remote."
+        remoteBranch="origin"
     fi
     remoteBranch="$remoteBranch/$currentBranch"
 fi
