@@ -7,10 +7,9 @@
 	statusHints = false
 
 [alias]
-	bfetch = branch-pull --fetch-only
-	bpull = branch-pull
-	bpush = branch-push
-	bpushp = branch-push --prompt
+	pfetch = branch-pull --fetch-only
+	ppull = branch-pull
+	ppush = branch-push
 	branch-ages = for-each-ref --sort=committerdate refs/remotes refs/heads --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:green)%(committerdate:relative)%(color:reset) - %(authorname)'
 	ignored = ls-files -o -i --exclude-standard
 	last-week = !git log --all --author=\"$(git config user.name)\" --since='2 sunday ago' --until='1 sunday ago' --date-order --reverse --date=short --format=format:'%C(blue)%cd %C(yellow)(%cr) %C(green)%h %Creset%s'
