@@ -2,7 +2,7 @@
 # Run commands completely detached from current terminal by append '\&"
 alias -g "\&"="&>/dev/null&|"
 
-alias ls='ls --color=auto'
+alias ls='ls --color=auto --time-style="+%F %R"'
 alias ll='ls -lh'
 alias la='ls -lhA'
 
