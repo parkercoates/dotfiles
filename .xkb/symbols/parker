@@ -53,8 +53,11 @@ xkb_symbols "altgr-intl" {
 // Bullets
     key <AB05> { [ b, B, enfilledcircbullet, enopencircbullet ] };
 
-// Ellipsis
-    key <AB09>  { [ period, greater, ellipsis, dead_abovedot ] };
+// Guillemet
+    key <AB08>  { [ comma, less, dead_cedilla, guillemotleft ] };
+
+// Ellipsis and guillemet
+    key <AB09>  { [ period, greater, ellipsis, guillemotright ] };
 
 // Interrobang
     key <AB10> { [ slash, question, questiondown, U203D ] };

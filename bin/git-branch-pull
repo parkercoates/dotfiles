@@ -129,7 +129,7 @@ if [ "$remote/$branch" != "$remoteBranch" ]; then
     fail "\"$remoteBranch\" isn't in the format \"<remote>/<branch>\""
 fi
 
-if [ "$(git remote 2> /dev/null 2> /dev/null | grep $remote)" != "$remote"  ]; then
+if [ "$(git remote 2> /dev/null 2> /dev/null | grep "^$remote$")" != "$remote"  ]; then
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
@@ -151,7 +151,7 @@ git --no-pager log --reverse --use-mailmap --format=format:'%C(magenta)%ar %C(gr
 echo
 echo
 echo 'Files changed:'
-git --no-pager diff --stat $mergeBase..$remoteHash
+git --no-pager diff --stat --stat-count=$(tput lines) $mergeBase..$remoteHash
 echo
 
 

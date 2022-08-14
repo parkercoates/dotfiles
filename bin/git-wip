@@ -9,7 +9,7 @@ wip!*)
         git add -A :/
         git ls-files --deleted -z | xargs -0r git rm
     fi
-    git commit -m "wip!"
+    git commit --no-verify -m "wip!"
     ;;
 esac
 

@@ -7,6 +7,7 @@ alias ll='ls -lh'
 alias la='ls -lhA'
 
 alias grep='grep --color=auto'
+alias prep='pcre2grep'
 
 # Development conveniences
 alias sshudo='eval `ssh-agent`; ssh-add; '

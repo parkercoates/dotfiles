@@ -1,6 +1,7 @@
 #! /bin/sh
 
-export CMAKE_GENERATOR=Ninja
+export CMAKE_GENERATOR='Ninja'
+export CMAKE_EXPORT_COMPILE_COMMANDS='ON'
 
 export NINJA_STATUS='[%f/%t %r×] '
 
@@ -11,6 +12,58 @@ export GCC_COLORS='error=01;31:warning=01;33:note=01;36:caret=01;32:locus=01:quo
 export QT_MESSAGE_PATTERN="$(echo -e '[\e[32m%{time process} %{if-debug}\e[36m%{endif}%{if-warning}\e[33m%{endif}%{if-critical}\e[31m%{endif}%{function}\e[0m] %{message}')"
 export QML_IMPORT_TRACE='1'
 
+function acksed() {
+    if [[ "$1" = '--no-preview' ]]; then
+        local noPreview='true'
+        shift 1
+    fi
+
+    old=${1//\//\\/}
+    new=${2//\//\\/}
+    shift 2
+
+    ackFlags=(--nosmart-case --ignore-dir=build --ignore-dir=third-party-libraries)
+
+    if [[ "$noPreview" != 'true' ]]; then
+        ack ${ackFlags[@]} "$@" "$old" || return 1
+
+        echo -n "Go ahead with replacement by '$new'? (y/N) "
+        read REPLY
+        echo
+        if [ "$REPLY" != 'y' -a "$REPLY" != 'Y' ]; then
+            return 0
+        fi
+    fi
+
+    ack ${ackFlags[@]} -l --print0 "$@" "$old" | xargs -0 --no-run-if-empty perl -i -pe "s/$old/$new/g"
+}
+
+function acksed2() {
+    if [[ "$1" = '--no-preview' ]]; then
+        local noPreview='true'
+        shift 1
+    fi
+
+    old=${1//\//\\/}
+    new=${2//\//\\/}
+    shift 2
+
+    ackFlags=$@
+    ackFlags+=(--nosmart-case)
+
+    if [[ "$noPreview" != 'true' ]]; then
+        ack ${ackFlags[@]} "$old" || return 1
+
+        echo -n "Go ahead with replacement by '$new'? (y/N) "
+        read REPLY
+        echo
+        if [ "$REPLY" != 'y' -a "$REPLY" != 'Y' ]; then
+            return 0
+        fi
+    fi
+
+    ack ${ackFlags[@]} -l --print0 "$old" | xargs -0 --no-run-if-empty perl -i -pe "s/$old/$new/g"
+}
 function qtc() {
     workdir=$(pwd | grep -P -o '[\w-]+-worktree')
     if [[ -n "$workdir" ]]; then
@@ -70,6 +123,11 @@ function cmg()
     cmake-gui "$(findbuild)"  &>/dev/null&|
 }
 
+function ccm()
+{
+    ccmake "$(findbuild)"
+}
+
 function istarget()
 {
     ninja -C "$(findbuild)" -t targets all | grep "^$1:" > /dev/null;
@@ -110,6 +168,16 @@ function bld()
 }
 
 function cln()
+{
+    bld -tclean $*
+}
+
+function clnbld()
+{
+    cln $* && bld $*
+}
+
+function clncwd()
 {
     cb && find . -type f \( -name '*.o' -o -name '*.ghc' -o -name 'ui_*.h' -o -name 'moc_*.cpp' -o -name '*.moc' \) -delete -print
     cs

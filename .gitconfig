@@ -1,6 +1,7 @@
 [user]
 	email = coates@qps.nl
 	name = Parker Coates
+	useConfigOnly = true
 
 [advice]
 	detachedHead = false
@@ -54,6 +55,7 @@
 	historybrowser = gitk
 
 [init]
+	defaultBranch = main
 	templatedir = ~/.gittemplates
 
 [log]

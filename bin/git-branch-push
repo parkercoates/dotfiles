@@ -189,7 +189,7 @@ if [ "$remote/$branch" != "$remoteBranch" ]; then
     fail "\"$remoteBranch\" isn't in the format \"<remote>/<branch>\""
 fi
 
-if [ "$(git remote 2> /dev/null | grep $remote)" != "$remote"  ]; then
+if [ "$(git remote 2> /dev/null | grep "^$remote$")" != "$remote"  ]; then
     fail "\"$remote\" doesn't appear to be a valid remote."
 fi
 
@@ -228,15 +228,18 @@ if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
     echo
 
     echo 'Files changed:'
-    git --no-pager diff --stat -M10% $remoteHash..$sourceHash
+    git --no-pager diff --stat --stat-count=$(tput lines) -M10% $remoteHash..$sourceHash
     echo
 fi
 
 echo -e "Destination branch: $(tput setaf 2)$remoteBranch$(tput sgr 0)"
+if [ -n "$setUpstreamFlag" ]; then
+    echo "                    $(tput setaf 3)This branch will be made the upstream of $currentBranch.$(tput sgr 0)"
+fi
 if [ "$createMode" != 'true' -a "$deleteMode" != 'true' ]; then
     if [ "$reverseCommitCount" -gt 0 -a -z "$forceFlag" ]; then
         echo
-        echo "$(tput setaf 3)This appears to be a force push without the --force flag.$(tput sgr 0)"
+        echo "$(tput setaf 1)This appears to be a force push without the --force flag.$(tput sgr 0)"
     elif [ "$reverseCommitCount" -eq 0 -a -n "$forceFlag" ]; then
         echo
         echo "$(tput setaf 3)The --force flag appears to be unnecessary.$(tput sgr 0)"
