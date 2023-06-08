@@ -2,7 +2,12 @@
 # Run commands completely detached from current terminal by append '\&"
 alias -g "\&"="&>/dev/null&|"
 
-alias ls='ls --color=auto --time-style="+%F %R"'
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias ls='ls --color=auto -D"%F %R"'
+else
+    alias ls='ls --color=auto --time-style="+%F %R"'
+fi
+
 alias ll='ls -lh'
 alias la='ls -lhA'
 

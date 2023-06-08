@@ -5,7 +5,9 @@ export CMAKE_EXPORT_COMPILE_COMMANDS='ON'
 
 export NINJA_STATUS='[%f/%t %r×] '
 
-export MAKEFLAGS="-j$(nproc)"
+if type nproc &> /dev/null; then
+    export MAKEFLAGS="-j$(nproc)"
+fi
 
 export GCC_COLORS='error=01;31:warning=01;33:note=01;36:caret=01;32:locus=01:quote=36'
 

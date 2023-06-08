@@ -19,7 +19,9 @@ export EDITOR='vim'
 export VISUAL='vim'
 
 export LESS="-RIM"
-eval `dircolors -b`
+if type dircolors &>/dev/null; then
+    eval `dircolors -b`
+fi
 
 WORDCHARS='_-'
 
