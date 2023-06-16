@@ -35,7 +35,7 @@ source $ZSH/cdup.zsh
 
 source $ZSH/completion.zsh
 
-if type fasd >/dev/null 2>&1; then
+if type fasd &>/dev/null; then
     source $ZSH/fasd.zsh
 fi
 
@@ -56,7 +56,9 @@ source $ZSH/zsh-history-substring-search.zsh
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-if type fzf >/dev/null 2>&1; then
+source $ZSH/ssh-agent.zsh
+
+if type fzf &> /dev/null; then
     source $ZSH/fzf.zsh
 fi
 
