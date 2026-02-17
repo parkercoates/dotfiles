@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+git show --format="%ai" --no-patch > timestamp
+vim timestamp
+git commit --amend --date="$(cat timestamp)" --no-edit
+rm timestamp
